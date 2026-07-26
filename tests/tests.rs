@@ -96,7 +96,7 @@ mod hooke_spring_tests {
         // but we check them here to verify invalid states propagates through the instance as we logically expect it to
         // and not to invariants that were not messed with
 
-        // Case A: varget is now invalid
+        // Case A: target is now invalid
         let mut hs = HookeSpring::from_damper_speed(1.0, 1.0, Some(ManualClock::wrapped()));
         hs.set_target(f64::INFINITY, None);
         let (pos, vel) = hs.get_position_and_velocity();
