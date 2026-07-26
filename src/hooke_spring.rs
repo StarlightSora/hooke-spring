@@ -5,10 +5,10 @@ pub trait HookeSpringClock {
     fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs;
     fn time_skip(&mut self, by: ElapsedTimeSecs);
 }
-type WrappedHookeSpringClock = Box<dyn HookeSpringClock>;
+pub type WrappedHookeSpringClock = Box<dyn HookeSpringClock>;
 
-type HookeSpringDamper = f64;
-type HookeSpringSpeed = f64;
+pub type HookeSpringDamper = f64;
+pub type HookeSpringSpeed = f64;
 pub struct HookeSpring<T> {
     position: T,
     velocity: T,

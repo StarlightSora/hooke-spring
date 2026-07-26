@@ -1,5 +1,9 @@
 pub use clocks::manual_clock::ManualClock;
 pub use clocks::smol_stopwatch::SmolStopwatch;
+pub use clocks::units::ElapsedTimeSecs;
+
+pub use hooke_spring::HookeSpringSpeed;
+pub use hooke_spring::HookeSpringDamper;
 pub use hooke_spring::HookeSpring;
 
 pub mod hooke_spring;
