@@ -34,7 +34,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
         damper: Option<HookeSpringDamper>, speed: Option<HookeSpringSpeed>,
         clock: Option<WrappedHookeSpringClock>,
     ) -> Self {
-        HookeSpring {
+        Self {
             position: position.unwrap_or_default(),
             velocity: velocity.unwrap_or_default(),
             target: target.unwrap_or_default(),

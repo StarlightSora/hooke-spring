@@ -14,6 +14,11 @@ impl HookeSpringClock for ManualClock {
 }
 impl Default for ManualClock {
     fn default() -> Self {
-        Self { elapsed: 0.0 }
+        Self::new()
+    }
+}
+impl ManualClock {
+    fn new() -> Self {
+        Self { elapsed: 0.0f64 }
     }
 }

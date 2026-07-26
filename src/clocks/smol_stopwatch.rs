@@ -30,8 +30,8 @@ impl Default for SmolStopwatch {
     }
 }
 impl SmolStopwatch {
-    pub fn new() -> SmolStopwatch {
-        SmolStopwatch {
+    pub fn new() -> Self {
+        Self {
             instant: Instant::now(),
             last_evaluated_real: 0.0,
             last_effective_time: 0.0,
