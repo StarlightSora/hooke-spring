@@ -87,13 +87,8 @@ for<'a> &'a T: Mul<f64, Output = T> {
     }
     /// Modifies the `target`.
     /// 
-    /// If `do_not_animate` is `Some(false)` or `None`,
-    /// then it simply updates the `target` of the instance.
-    /// 
-    /// If `do_not_animate` is `Some(true)`,
-    /// then it updates the `target` and `position` to `to`,
-    /// and sets the `velocity` to zero (by multiplying `velocity` with `0.0`).
-    /// This causes the instance to call `update_last_evaluated`, but not `re_evaluate_and_update`.
+    /// If `do_not_animate` is `Some(true)`, the position and target are set immediately
+    /// and velocity is reset to zero. Otherwise, only the target is updated.
     pub fn set_target(&mut self, to: T, do_not_animate: Option<bool>) {
         let no_anim = do_not_animate.unwrap_or(false);
         if no_anim {
@@ -196,7 +191,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
         self.clock.evaluate_elapsed()
     }
 
-    /// Provides a mutable reference to the `clock` of this intsnace.
+    /// Provides a mutable reference to the `clock`.
     /// 
     /// Mutating the clock directly may affect how the instance evaluates elapsed time.
     pub fn clock_mut(&mut self) -> &mut WrappedHookeSpringClock {
