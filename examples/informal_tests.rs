@@ -1,5 +1,4 @@
-use std::{time::Instant};
-
+use std::time::{Instant, Duration};
 use hooke_spring::HookeSpring;
 
 fn main() {
@@ -20,6 +19,6 @@ fn main() {
     for _ in 0..10 {
         let (pos, vel) = spring.get_position_and_velocity();
         println!("t+:{}ms: pos = {}, vel = {}", now.elapsed().as_millis(), pos, vel);
-        std::thread::sleep(std::time::Duration::from_millis(200));
+        std::thread::sleep(Duration::from_millis(200));
     }
 }
