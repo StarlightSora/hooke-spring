@@ -31,7 +31,12 @@ pub type HookeSpringSpeed = f64;
 /// `T` should be finite for all mutating methods that accept `T` in its parameters.
 /// Likewise, all mutating methods that accept `HookeSpringDamper` or `HookeSpringSpeed` should be finite.
 /// 
-/// If this contract is broken, then downstream behavior of the instance is undefined.
+/// If these contracts are broken, then invalid values will propagate through the instance,
+/// and downstream behavior of the instance becomes undefined.
+/// 
+/// To be specific, `position` and `velocity` will always be invalid if any of the properties become invalid.
+/// `target`, `damper` and `speed` will not be invalid, unless they are the source of the propagation.
+/// Elapsed time will not be invalid, unless `clock` was mutated to return an invalid value. 
 pub struct HookeSpring<T> {
     position: T,
     velocity: T,
