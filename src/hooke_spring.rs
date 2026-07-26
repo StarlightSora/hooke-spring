@@ -204,7 +204,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
         &mut self.clock
     }
 
-    /// wrapper for calling `re_evaluate`, updating `position` and `velocity`, then calling `update_last_evaluated`
+    // wrapper for calling `re_evaluate`, updating `position` and `velocity`, then calling `update_last_evaluated`
     fn re_evaluate_and_update(&mut self) {
         let elapsed = self.get_elapsed_time();
         let (new_position, new_velocity) = self.re_evaluate(&elapsed);
