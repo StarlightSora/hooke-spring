@@ -46,6 +46,10 @@ impl SmolStopwatch {
             time_scale: 1.0,
         }
     }
+    /// Creates a `SmolStopwatch` instance wrapped in a `Box`.
+    pub fn wrapped() -> Box<Self> {
+        Box::new(Self::new())
+    }
 
     /// Queries the `time_scale`.
     pub fn get_time_scale(&self) -> &f64 {

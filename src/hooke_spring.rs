@@ -18,10 +18,12 @@ pub type WrappedHookeSpringClock = Box<dyn HookeSpringClock>;
 pub type HookeSpringDamper = f64;
 /// Alias for `f64` for clarity.
 pub type HookeSpringSpeed = f64;
-/// A spring that can be simulated according to Hooke's law.
+/// A spring that can be simulated according to Hooke's Law.
 /// 
 /// It is evaluated lazily (only when needed).
-/// All methods that causes the instance to re-evaluate itself are marked as such.
+/// 
+/// All mutating methods cause the instance to **fully re-evaluate itself**, unless specified otherwise.
+/// Full re-evaluation is defined as the instance re-evaluating the elapsed time, `position` and `velocity.`
 /// 
 /// Timekeeping is done by the `clock` of the instance.
 pub struct HookeSpring<T> {
@@ -37,9 +39,9 @@ pub struct HookeSpring<T> {
 impl<T> Default for HookeSpring<T>
 where T: Default + Copy + AddAssign + Add<T, Output = T> + Mul<f64, Output = T> + MulAssign<f64>,
 for<'a> &'a T: Mul<f64, Output = T> {
-    /// The default constructor for `HookeSpring<T>`.
+    /// The default constructor for `HookeSpring::T`.
     /// 
-    /// It is a shorthand for `HookeSpring<T>::new(None, None, None, None, None, None)`.
+    /// It is a shorthand for `HookeSpring::T::new(None, None, None, None, None, None)`.
     fn default() -> Self {
         Self::new(None, None, None, None, None, None)
     }
@@ -47,11 +49,25 @@ for<'a> &'a T: Mul<f64, Output = T> {
 impl<T> HookeSpring<T> 
 where T: Default + Copy + AddAssign + Add<T, Output = T> + Mul<f64, Output = T> + MulAssign<f64>,
 for<'a> &'a T: Mul<f64, Output = T> {
-    /// The general-purpose constructor for `HookeSpring<T>`.
+    /// The general-purpose constructor for `HookeSpring::T`.
     /// 
     /// `position`, `velocity` and `target` defaults to the default of `T`, if not provided.
     /// `damper` and `speed` defaults to `1.0f64`.
     /// `clock` defaults to a `SmolStopwatch` instance wrapped in a `Box`.
+    /// 
+    /// # Examples
+    ///
+    /// ```
+    /// use hooke_spring::HookeSpring;
+    ///
+    /// // Create a spring with default values
+    /// let mut spring = HookeSpring::<f64>::new(None, None, None, None, None, None);
+    ///
+    /// // Query its position and velocity
+    /// let (pos, vel) = spring.get_position_and_velocity();
+    /// assert_eq!(*pos, 0.0);
+    /// assert_eq!(*vel, 0.0);
+    /// ```
     pub fn new(
         position: Option<T>, velocity: Option<T>, target: Option<T>,
         damper: Option<HookeSpringDamper>, speed: Option<HookeSpringSpeed>,
@@ -64,31 +80,86 @@ for<'a> &'a T: Mul<f64, Output = T> {
             damper: damper.unwrap_or(1.0f64),
             speed: speed.unwrap_or(1.0f64),
             last_evaluated: 0.0f64,
-            clock: clock.unwrap_or_else(|| Box::new(SmolStopwatch::new())),
+            clock: clock.unwrap_or_else(|| SmolStopwatch::wrapped()),
         }
     }
     /// Construct a `HookeSpring<T>` instance from the given `damper` and `speed`, and optional `clock`.
     /// 
     /// The position, velocity and target of the resulting instance will be set to the default of `T`.
-    /// In other words, it is a shorthand for `HookeSpring<T>::new(None, None, None, Some(damper), Some(speed), clock)`.
+    /// In other words, it is a shorthand for `HookeSpring::T::new(None, None, None, Some(damper), Some(speed), clock)`.
     pub fn from_damper_speed(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<WrappedHookeSpringClock>) -> Self {
         Self::new(None, None, None, Some(damper), Some(speed), clock)
     }
 
     /// Apply an impulse to the spring, incrementing its velocity.
+    /// 
+    /// # Examples
+    ///
+    /// ```
+    /// use hooke_spring::HookeSpring;
+    /// use hooke_spring::ManualClock;
+    ///
+    /// // ManualClock is used in the example for deterministic behavior. 
+    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, Some(ManualClock::wrapped()));
+    /// spring.impulse(5.0);
+    ///
+    /// // After the impulse, velocity should be incremented
+    /// assert_eq!(*spring.get_velocity(), 5.0);
+    /// ```
     pub fn impulse(&mut self, by: T) {
-        self.velocity += by
+        self.re_evaluate_and_update();
+        self.velocity += by;
+    }
+    /// Shifts (increments) the position of the spring.
+    pub fn shift(&mut self, by: T) {
+        self.re_evaluate_and_update();
+        self.position += by;
     }
     /// Forcibly advances the elapsed time.
     /// 
-    /// This internally calls `clock.time_skip` of the instance.
+    /// This does not cause the instance to re-evaluate itself; it only mutates the `clock`.
+    /// 
+    /// # Examples
+    ///
+    /// ```
+    /// use hooke_spring::HookeSpring;
+    /// use hooke_spring::ManualClock;
+    ///
+    /// // ManualClock is used in the example for deterministic behavior. 
+    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, Some(ManualClock::wrapped()));
+    /// spring.time_skip(4.0);
+    ///
+    /// // 4 seconds should have elapsed on spring
+    /// assert_eq!(spring.get_elapsed_time(), 4.0);
     pub fn time_skip(&mut self, by: ElapsedTimeSecs) {
         self.clock.time_skip(by);
     }
     /// Modifies the `target`.
     /// 
     /// If `do_not_animate` is `Some(true)`, the position and target are set immediately
-    /// and velocity is reset to zero. Otherwise, only the target is updated.
+    /// and velocity is reset to zero. This only causes the instance to re-evaluate the elapsed time.
+    /// 
+    /// Otherwise, the instance fully re-evaluates itself, then the target is updated.
+    /// 
+    /// # Examples
+    ///
+    /// ```
+    /// use hooke_spring::HookeSpring;
+    /// use hooke_spring::ManualClock;
+    ///
+    /// // ManualClock is used in the example for deterministic behavior. 
+    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, Some(ManualClock::wrapped()));
+    /// spring.set_target(10.0, Some(true));
+    ///
+    /// // Position and target are immediately updated
+    /// assert_eq!(*spring.get_position(), 10.0);
+    /// assert_eq!(*spring.get_target(), 10.0);
+    /// 
+    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, Some(ManualClock::wrapped()));
+    /// spring.set_target(10.0, None);
+    /// assert_eq!(*spring.get_position(), 0.0);
+    /// assert_eq!(*spring.get_target(), 10.0);
+    /// ```
     pub fn set_target(&mut self, to: T, do_not_animate: Option<bool>) {
         let no_anim = do_not_animate.unwrap_or(false);
         if no_anim {
@@ -98,34 +169,27 @@ for<'a> &'a T: Mul<f64, Output = T> {
             let new_elapsed = self.get_elapsed_time();
             self.update_last_evaluated(new_elapsed);
         } else {
+            self.re_evaluate_and_update();
             self.target = to;
         }
     }
     /// Modifies the `damper`.
-    /// 
-    /// This causes the instance to re-evaluate itself.
     pub fn set_damper(&mut self, to: HookeSpringDamper) {
         self.re_evaluate_and_update();
         self.damper = to;
     }
     /// Modifies the `speed`.
-    /// 
-    /// This causes the instance to re-evaluate itself.
     pub fn set_speed(&mut self, to: HookeSpringSpeed) {
         self.re_evaluate_and_update();
         self.speed = to;
     }
     /// Modifies the `damper` and `speed` at the same time.
-    /// 
-    /// This causes the instance to re-evaluate itself.
     pub fn set_damper_and_speed(&mut self, damper_to: HookeSpringDamper, speed_to: HookeSpringSpeed) {
         self.re_evaluate_and_update();
         self.damper = damper_to;
         self.speed = speed_to;
     }
     /// Modifies the `position`.
-    /// 
-    /// This causes the instance to re-evaluate itself.
     pub fn set_position(&mut self, to: T) {
         let elapsed = self.get_elapsed_time();
         let (_, vel) = self.re_evaluate(&elapsed);
@@ -134,8 +198,6 @@ for<'a> &'a T: Mul<f64, Output = T> {
         self.update_last_evaluated(elapsed);
     }
     /// Modifies the `velocity`.
-    /// 
-    /// This causes the instance to re-evaluate itself.
     pub fn set_velocity(&mut self, to: T) {
         let elapsed = self.get_elapsed_time();
         let (pos, _) = self.re_evaluate(&elapsed);
@@ -145,8 +207,9 @@ for<'a> &'a T: Mul<f64, Output = T> {
     }
     /// Modifies the `position` and `velocity` at the same time.
     /// 
-    /// This does *not* cause the instance to re-evaluate itself.
+    /// This only causes the instance to re-evaluate its elapsed time.
     pub fn set_position_velocity(&mut self, position_to: T, velocity_to: T) {
+        // there is no point to call re_evaluate when we will overwrite both position and velocity anyways
         let elapsed = self.get_elapsed_time();
         self.position = position_to;
         self.velocity = velocity_to;
@@ -154,22 +217,16 @@ for<'a> &'a T: Mul<f64, Output = T> {
     }
     
     /// Queries the `position`.
-    /// 
-    /// This causes the instance to re-evaluate itself.
     pub fn get_position(&mut self) -> &T {
         self.re_evaluate_and_update();
         &self.position
     }
     /// Queries the `velocity`.
-    /// 
-    /// This causes the instance to re-evaluate itself.
     pub fn get_velocity(&mut self) -> &T {
         self.re_evaluate_and_update();
         &self.velocity
     }
     /// Queries the `position` and `velocity` at the same time.
-    /// 
-    /// This causes the instance to re-evaluate itself.
     pub fn get_position_and_velocity(&mut self) -> (&T, &T) {
         self.re_evaluate_and_update();
         (&self.position, &self.velocity)
@@ -187,6 +244,8 @@ for<'a> &'a T: Mul<f64, Output = T> {
         &self.speed
     }
     /// Queries how long the instance has been simulating for.
+    /// 
+    /// This only causes the instance to re-evaluate its elapsed time.
     pub fn get_elapsed_time(&mut self) -> ElapsedTimeSecs {
         self.clock.evaluate_elapsed()
     }

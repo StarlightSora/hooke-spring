@@ -23,7 +23,11 @@ impl Default for ManualClock {
 }
 impl ManualClock {
     /// Creates a `ManualClock` instance.
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self { elapsed: 0.0f64 }
+    }
+    /// Creates a `ManualClock` instance wrapped in a `Box`.
+    pub fn wrapped() -> Box<Self> {
+        Box::new(Self::new())
     }
 }
