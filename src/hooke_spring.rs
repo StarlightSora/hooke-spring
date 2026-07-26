@@ -28,7 +28,7 @@ pub type HookeSpringSpeed = f64;
 /// Timekeeping is done by the `clock` of the instance.
 /// `clock` should always return a finite value when `evaluate_elapsed` is called on it.
 /// 
-/// `T` should be finite for all mutating methods that accept a `T` in its parameters.
+/// `T` should be finite for all mutating methods that accept `T` in its parameters.
 /// Likewise, all mutating methods that accept `HookeSpringDamper` or `HookeSpringSpeed` should be finite.
 /// 
 /// If this contract is broken, then downstream behavior of the instance is undefined.
@@ -155,6 +155,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     ///
     /// // ManualClock is used in the example for deterministic behavior. 
     /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, Some(ManualClock::wrapped()));
+    /// // Set the target without animating
     /// spring.set_target(10.0, Some(true));
     ///
     /// // Position and target are immediately updated
@@ -162,7 +163,10 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// assert_eq!(*spring.get_target(), 10.0);
     /// 
     /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, Some(ManualClock::wrapped()));
+    /// // Set the target with animating
     /// spring.set_target(10.0, None);
+    /// 
+    /// // Only the target is updated
     /// assert_eq!(*spring.get_position(), 0.0);
     /// assert_eq!(*spring.get_target(), 10.0);
     /// ```
