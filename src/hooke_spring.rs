@@ -26,6 +26,12 @@ pub type HookeSpringSpeed = f64;
 /// Full re-evaluation is defined as the instance re-evaluating the elapsed time, `position` and `velocity.`
 /// 
 /// Timekeeping is done by the `clock` of the instance.
+/// `clock` should always return a finite value when `evaluate_elapsed` is called on it.
+/// 
+/// `T` should be finite for all mutating methods that accept a `T` in its parameters.
+/// Likewise, all mutating methods that accept `HookeSpringDamper` or `HookeSpringSpeed` should be finite.
+/// 
+/// If this contract is broken, then downstream behavior of the instance is undefined.
 pub struct HookeSpring<T> {
     position: T,
     velocity: T,
