@@ -49,6 +49,8 @@ fn main() {
     println!("Simulation of {} steps ({} seconds) took {}us", SIM_STEPS, SIM_DT*(SIM_STEPS as f64), &wall_clock_elapsed_us);
     println!("Average time spent per frame: {}ns, target framerate delta time: {}us", time_spent_per_frame_ns, SIM_DT*1000.0*1000.0);
 }
+#[cfg(feature = "no_std")]
+fn main() {}
 
 pub struct SimpleVector3 {
     pub x: f64,

@@ -23,3 +23,5 @@ fn main() {
         std::thread::sleep(Duration::from_millis(200));
     }
 }
+#[cfg(feature = "no_std")]
+fn main() {}
