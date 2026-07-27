@@ -116,7 +116,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// ```
     /// use hooke_spring::HookeSpring;
     ///
-    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, ManualClock);
+    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, None);
     /// spring.impulse(5.0);
     ///
     /// // After the impulse, velocity should be incremented
