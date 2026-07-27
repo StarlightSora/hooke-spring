@@ -1,7 +1,8 @@
-use std::time::{Instant, Duration};
-use hooke_spring::HookeSpring;
-
+#[cfg(feature = "std")]
 fn main() {
+    use std::time::{Instant, Duration};
+    use hooke_spring::HookeSpring;
+
     let mut spring = HookeSpring::new(
         Some(0.0),   // position
         Some(0.0),   // velocity

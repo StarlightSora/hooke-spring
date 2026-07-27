@@ -4,9 +4,11 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-default = ["std"]
-std = ["smol_stopwatch"]
-smol_stopwatch = []
+default = ["std", "smol_stopwatch"]
+std = []
+smol_stopwatch = ["std"]
+no_std = ["libm"]
+libm = ["dep:libm"]
 
 [dependencies]
-libm = "0.2"
+libm = { version = "0.2", optional = true }

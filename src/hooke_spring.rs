@@ -4,7 +4,7 @@ use alloc::boxed::Box;
 use core::ops::{Add, AddAssign, Mul, MulAssign};
 use crate::ManualClock;
 
-#[cfg(not(feature = "std"))]
+#[cfg(feature = "libm")]
 use libm::{sqrt, exp, cos, sin};
 
 use super::clocks::units::ElapsedTimeSecs;
@@ -12,7 +12,7 @@ use super::clocks::units::ElapsedTimeSecs;
 /// Traits that constitute a `HookeSpringClock`.
 /// It is able to evaluate the elapsed time,
 /// and able to modify the elapsed time.
-pub trait HookeSpringClock {
+pub trait HookeSpringClock: Send + Sync {
     /// Evaluates how much time has passed since the instance's creation.
     fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs;
     /// Forcibly advances the elapsed time.
@@ -59,7 +59,7 @@ where T: Default + Copy + AddAssign + Add<T, Output = T> + Mul<f64, Output = T> 
 for<'a> &'a T: Mul<f64, Output = T> {
     /// The default constructor for `HookeSpring::T`.
     /// 
-    /// It is a shorthand for `HookeSpring::T::new(None, None, None, None, None, None)`.
+    /// It is a shorthand for `HookeSpring::<T>::new(None, None, None, None, None, None)`.
     fn default() -> Self {
         Self::new(None, None, None, None, None, None)
     }
@@ -104,7 +104,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// Construct a `HookeSpring<T>` instance from the given `damper` and `speed`, and optional `clock`.
     /// 
     /// The position, velocity and target of the resulting instance will be set to the default of `T`.
-    /// In other words, it is a shorthand for `HookeSpring::T::new(None, None, None, Some(damper), Some(speed), clock)`.
+    /// In other words, it is a shorthand for `HookeSpring::<T>::new(None, None, None, Some(damper), Some(speed), clock)`.
     pub fn from_damper_speed(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<WrappedHookeSpringClock>) -> Self {
         Self::new(None, None, None, Some(damper), Some(speed), clock)
     }
@@ -296,7 +296,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
         let d2 = self.damper * self.damper;
 
         let (h, si, co): (f64, f64, f64);
-        #[cfg(feature = "std")]
+        #[cfg(not(feature = "libm"))]
         if d2 < ONE {
             h = f64::sqrt(ONE - d2);
             let ep = f64::exp(-d * t) / h;
@@ -314,7 +314,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
             co = u + v;
             si = u - v;
         }
-        #[cfg(not(feature = "std"))]
+        #[cfg(feature = "libm")]
         if d2 < ONE {
             h = sqrt(ONE - d2);
             let ep = exp(-d * t) / h;
