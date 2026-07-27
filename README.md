@@ -6,7 +6,7 @@
 ![docs](https://img.shields.io/docsrs/hooke-spring)
 
 ## Overview
-`hooke-spring` provides a simple, fast and flexible spring simulator based on Hooke’s Law. It’s designed for recoil, camera shake, UI animations, and other physically‑inspired effects. The crate is **`no_std` + `alloc` compatible**, with optional `std` features for real‑time clocks.
+`hooke-spring` provides a simple, fast and flexible spring simulator based on Hooke’s Law. It’s designed for recoil, camera shake, UI animations, and other physically‑inspired effects. Although originally designed for use in games, it can be used wherever a lightweight spring simulator is needed. The crate is **`no_std` + `alloc` compatible**, with optional `std` features for real‑time clocks.
 
 ## Features
 |Feature|Description|Requires|Incompatible With|
@@ -24,7 +24,7 @@ cargo add hooke-spring
 # no_std + alloc
 cargo add hooke-spring --no-default-features --features no_std
 
-# std without SmolStopwatch
+# std without smol_stopwatch
 cargo add hooke-spring --no-default-features --features std
 ```
 
@@ -35,7 +35,7 @@ use std::{time, thread};
 
 let mut spring = HookeSpring::<f64>::from_damper_speed(0.75, 8.0, Some(SmolStopwatch::wrapped()));
 spring.impulse(10.0);
-for i in 0..10 {
+for i in 1..=10 {
     let (pos, vel) = spring.get_position_and_velocity();
     println!("[Iteration {i}] Position: {}, Velocity: {}", pos, vel);
     thread::sleep(time::Duration::from_millis(100));
@@ -43,10 +43,10 @@ for i in 0..10 {
 ```
 
 ## Roadmap
-
 - **0.1**: Core spring simulation, `no_std` support, integrated time-keeping structs
-- **0.2**: Bindings for `godot-rust` for integration with Godot (Will be opt-in via features)
-
+- **0.2**: Integration for game engines (will be opt-in via features)
+  - Integration with Godot via `godot-rust` bindings
+  - Integration with Bevy
 
 ## Attribution
 This project is a Rust rewrite inspired by the `Spring.lua` module from [NevermoreEngine](https://github.com/Quenty/NevermoreEngine).
