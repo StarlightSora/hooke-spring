@@ -1,4 +1,6 @@
 //! Contains `SmolStopwatch`, a wrapper around `std::time::Instant` that can offset and dilate time.
+extern crate alloc;
+use alloc::boxed::Box;
 use std::time::Instant;
 use super::units::ElapsedTimeSecs;
 use super::super::hooke_spring::HookeSpringClock;

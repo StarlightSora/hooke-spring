@@ -1,6 +1,13 @@
 //! Contains `HookeSpring`, a spring you can simulate based on Hooke's Law.
-use std::ops::{Add, AddAssign, Mul, MulAssign};
-use super::clocks::{smol_stopwatch::SmolStopwatch, units::ElapsedTimeSecs};
+extern crate alloc;
+use alloc::boxed::Box;
+use core::ops::{Add, AddAssign, Mul, MulAssign};
+use crate::ManualClock;
+
+#[cfg(not(feature = "std"))]
+use libm::{sqrt, exp, cos, sin};
+
+use super::clocks::units::ElapsedTimeSecs;
 
 /// Traits that constitute a `HookeSpringClock`.
 /// It is able to evaluate the elapsed time,
@@ -64,7 +71,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// 
     /// `position`, `velocity` and `target` defaults to the default of `T`, if not provided.
     /// `damper` and `speed` defaults to `1.0f64`.
-    /// `clock` defaults to a `SmolStopwatch` instance wrapped in a `Box`.
+    /// `clock` defaults to a `ManualClock` instance wrapped in a `Box`.
     /// 
     /// # Examples
     ///
@@ -91,7 +98,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
             damper: damper.unwrap_or(1.0f64),
             speed: speed.unwrap_or(1.0f64),
             last_evaluated: 0.0f64,
-            clock: clock.unwrap_or_else(|| SmolStopwatch::wrapped()),
+            clock: clock.unwrap_or_else(|| ManualClock::wrapped()),
         }
     }
     /// Construct a `HookeSpring<T>` instance from the given `damper` and `speed`, and optional `clock`.
@@ -108,10 +115,8 @@ for<'a> &'a T: Mul<f64, Output = T> {
     ///
     /// ```
     /// use hooke_spring::HookeSpring;
-    /// use hooke_spring::ManualClock;
     ///
-    /// // ManualClock is used in the example for deterministic behavior. 
-    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, Some(ManualClock::wrapped()));
+    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, ManualClock);
     /// spring.impulse(5.0);
     ///
     /// // After the impulse, velocity should be incremented
@@ -134,10 +139,8 @@ for<'a> &'a T: Mul<f64, Output = T> {
     ///
     /// ```
     /// use hooke_spring::HookeSpring;
-    /// use hooke_spring::ManualClock;
     ///
-    /// // ManualClock is used in the example for deterministic behavior. 
-    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, Some(ManualClock::wrapped()));
+    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, None);
     /// spring.time_skip(4.0);
     ///
     /// // 4 seconds should have elapsed on spring
@@ -156,10 +159,8 @@ for<'a> &'a T: Mul<f64, Output = T> {
     ///
     /// ```
     /// use hooke_spring::HookeSpring;
-    /// use hooke_spring::ManualClock;
     ///
-    /// // ManualClock is used in the example for deterministic behavior. 
-    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, Some(ManualClock::wrapped()));
+    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, None);
     /// // Set the target without animating
     /// spring.set_target(10.0, Some(true));
     ///
@@ -167,7 +168,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// assert_eq!(*spring.get_position(), 10.0);
     /// assert_eq!(*spring.get_target(), 10.0);
     /// 
-    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, Some(ManualClock::wrapped()));
+    /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, None);
     /// // Set the target with animating
     /// spring.set_target(10.0, None);
     /// 
@@ -292,23 +293,42 @@ for<'a> &'a T: Mul<f64, Output = T> {
         let s = &self.speed;
         
         let t = s * (elapsed - self.last_evaluated);
-        let d2 = self.damper.powi(2);
+        let d2 = self.damper * self.damper;
 
         let (h, si, co): (f64, f64, f64);
-        if d2 < ONE { // Underdampened
+        #[cfg(feature = "std")]
+        if d2 < ONE {
             h = f64::sqrt(ONE - d2);
             let ep = f64::exp(-d * t) / h;
             co = ep * f64::cos(h * t);
             si = ep * f64::sin(h * t);
-        } else if d2 == ONE { // Critically damped
+        } else if d2 == ONE {
             h = ONE;
             let ep = f64::exp(-d * t) / h;
             co = ep;
             si = ep * t;
-        } else { // Overdamped
+        } else {
             h = f64::sqrt(d2 - ONE);
             let u = f64::exp((-d + h) * t) / (TWO * h);
             let v = f64::exp((-d - h) * t) / (TWO * h);
+            co = u + v;
+            si = u - v;
+        }
+        #[cfg(not(feature = "std"))]
+        if d2 < ONE {
+            h = sqrt(ONE - d2);
+            let ep = exp(-d * t) / h;
+            co = ep * cos(h * t);
+            si = ep * sin(h * t);
+        } else if d2 == ONE {
+            h = ONE;
+            let ep = exp(-d * t) / h;
+            co = ep;
+            si = ep * t;
+        } else {
+            h = sqrt(d2 - ONE);
+            let u = exp((-d + h) * t) / (TWO * h);
+            let v = exp((-d - h) * t) / (TWO * h);
             co = u + v;
             si = u - v;
         }

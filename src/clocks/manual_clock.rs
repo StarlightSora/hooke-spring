@@ -1,4 +1,6 @@
 //! Contains `ManualClock`. It is recommended to implement your own clock that implements `HookeSpringClock` for production use.
+extern crate alloc;
+use alloc::boxed::Box;
 use super::units::ElapsedTimeSecs;
 use super::super::hooke_spring::HookeSpringClock;
 

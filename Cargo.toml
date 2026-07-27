@@ -3,4 +3,10 @@ name = "hooke-spring"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+default = ["std"]
+std = ["smol_stopwatch"]
+smol_stopwatch = []
+
 [dependencies]
+libm = "0.2"
