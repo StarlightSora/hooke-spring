@@ -6,9 +6,21 @@
 ![docs](https://img.shields.io/docsrs/hooke-spring)
 
 ## Overview
-`hooke-spring` provides a simple, fast and flexible spring simulator based on Hooke’s Law. It’s designed for recoil, camera shake, UI animations, and other physically‑inspired effects. Although originally designed for use in games, it can be used wherever a lightweight spring simulator is needed. The crate is **`no_std` + `alloc` compatible**, with optional `std` features for real‑time clocks.
+`hooke-spring` provides a simple, fast and flexible spring simulator based on Hooke’s Law. Although originally designed for use in games, it can be used wherever a lightweight spring simulator is needed. The crate is **`no_std` + `alloc` compatible**, with optional `std` features for real‑time clocks.
 
-## Features
+## Use Cases
+You can use this library for:
+
+- Simulating weapon recoil
+- Shaking the camera for player feedback
+- Smoothing transitions for moving objects and procedural animations
+- Animating UI elements
+- Smoothing out value changes for displaying on a UI
+
+... and many more!
+
+## Flags
+This crate has the following Cargo features:
 |Feature|Description|Requires|Incompatible With|
 |---|---|---|---|
 |`std`|Enables usage of `std`|(None)|`no_std`|
@@ -16,7 +28,10 @@
 |`no_std`|Disables usage of `std`, use `libm` + `alloc` instead|`libm`|`std`|
 |`libm`|Uses the `libm` crate for math instead of `f64` intrinsics|(None)|(None)|
 
+It enables `std` and `smol_stopwatch` by default.
+
 ## Usage
+Add the crate to your `Cargo.toml`:
 ```bash
 # Default (std + smol_stopwatch)
 cargo add hooke-spring
@@ -49,6 +64,7 @@ for i in 1..=10 {
   - Integration with Bevy
 
 ## Attribution
-This project is a Rust rewrite inspired by the `Spring.lua` module from [NevermoreEngine](https://github.com/Quenty/NevermoreEngine).
+This project is licensed under the MIT license. See `/LICENSE.txt` for more information.
 
-To view the license of the original library, see `/LICENSES/LICENSE-NevermoreEngine.txt`
+This project is a Rust rewrite inspired by the `Spring.lua` module from the [NevermoreEngine](https://github.com/Quenty/NevermoreEngine) library.
+To view the license of the original library, see `/LICENSES/LICENSE-NevermoreEngine.txt`.
