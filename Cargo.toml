@@ -2,6 +2,9 @@
 name = "hooke-spring"
 license = "MIT"
 description = "A Lightweight Spring Simulation API in Rust"
+repository = "https://github.com/StarlightSora/hooke-spring"
+keywords = ["math", "spring", "sim"]
+categories = ["game-development", "mathematics", "no-std"]
 version = "0.1.0"
 edition = "2024"
 
