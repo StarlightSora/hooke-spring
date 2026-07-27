@@ -2,6 +2,10 @@ use std::ops::{Add, AddAssign, Mul, MulAssign};
 
 #[cfg(feature = "std")]
 fn main() {
+    // performance test in a somewhat realistic scenario where you'd use this library
+    // in a game framework or engine (i.e. Godot through godot-rs or Bevy). This is heavily simplified,
+    // and in real world usage there would be some performance overhead,
+    // but the library itself should be very performant
     use std::sync::{Mutex, Arc};
     use std::thread;
     use std::f64::consts::PI;
