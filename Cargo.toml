@@ -1,5 +1,7 @@
 [package]
 name = "hooke-spring"
+license = "MIT"
+description = "A Lightweight Spring Simulation API in Rust"
 version = "0.1.0"
 edition = "2024"
 
