@@ -7,7 +7,8 @@ use hooke_spring::{HookeSpring, HookeSpringDamper, HookeSpringSpeed};
 use super::super::clocks::units::ElapsedTimeSecs;
 
 // pull black magic spells into scope
-use super::macros::{assign_spring_compat_traits, hs_variant_match_typed, hs_variant_match_untyped, hs_variant_match_double_typed};
+use super::macros::{assign_spring_compat_traits, hs_variant_match_typed, hs_variant_match_untyped, hs_variant_match_double_typed,
+    hs_variant_getter_generic_deref};
 
 use std::ops::{Add, AddAssign, Mul, MulAssign};
 fn make_new_spring<T>(damper: Option<HookeSpringDamper>, speed: Option<HookeSpringSpeed>) -> HookeSpring<T>
@@ -111,7 +112,34 @@ impl RSHookeSpring {
     pub fn set_position_and_velocity(&mut self, position_to: HSCompatibleTypes, velocity_to: HSCompatibleTypes) {
         hs_variant_match_double_typed!(&mut self.spring, HookeSpring::set_position_velocity, position_to, velocity_to)
     }
-    // TODO getters
+    // Getters //
+    pub fn get_position(&mut self) -> HSCompatibleTypes {
+        hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::get_position)
+    }
+    pub fn get_velocity(&mut self) -> HSCompatibleTypes {
+        hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::get_velocity)
+    }
+    pub fn get_position_and_velocity(&mut self) -> (HSCompatibleTypes, HSCompatibleTypes) {
+        hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::get_position_and_velocity, true)
+    }
+    pub fn get_target(&mut self) -> HSCompatibleTypes {
+        hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::get_target)
+    }
+    pub fn get_damper(&mut self) -> f64 {
+        *hs_variant_match_untyped!(&mut self.spring, HookeSpring::get_damper)
+    }
+    pub fn get_speed(&mut self) -> f64 {
+        *hs_variant_match_untyped!(&mut self.spring, HookeSpring::get_speed)
+    }
+    pub fn get_elapsed_time(&mut self) -> f64 {
+        hs_variant_match_untyped!(&mut self.spring, HookeSpring::get_elapsed_time)
+    }
+
+    // clock_mut // 
+    pub fn clock_mut(&mut self) {
+        // TODO: Figure out what the hell to link as the `clock` for Godot's case first
+        unimplemented!()
+    }
 }
 
 #[godot_api]
