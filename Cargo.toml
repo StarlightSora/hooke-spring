@@ -5,11 +5,13 @@ description = "A Lightweight Spring Simulation API in Rust"
 repository = "https://github.com/StarlightSora/hooke-spring"
 keywords = ["math", "spring", "sim"]
 categories = ["game-development", "mathematics", "no-std"]
-version = "0.1.1"
+version = "0.2.0-dev"
 edition = "2024"
+publish = false # Suppress publishing during dev build
 
 [features]
 default = ["std", "smol_stopwatch"]
+godot_bind = ["dep:godot"]
 std = []
 smol_stopwatch = ["std"]
 no_std = ["libm"]
@@ -17,3 +19,4 @@ libm = ["dep:libm"]
 
 [dependencies]
 libm = { version = "0.2", optional = true }
+godot = { version = "0.5", optional = true }

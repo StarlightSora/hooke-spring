@@ -10,3 +10,6 @@ pub use hooke_spring::HookeSpring;
 
 pub mod hooke_spring;
 pub mod clocks;
+
+#[cfg(feature = "godot_bind")]
+pub mod godot_support;
