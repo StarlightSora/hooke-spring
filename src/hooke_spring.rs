@@ -12,7 +12,7 @@ use super::clocks::units::ElapsedTimeSecs;
 /// Traits that constitute a `HookeSpringClock`.
 /// It is able to evaluate the elapsed time,
 /// and able to modify the elapsed time.
-pub trait HookeSpringClock: Send + Sync {
+pub trait HookeSpringClock: Send + Sync + core::fmt::Debug {
     /// Evaluates how much time has passed since the instance's creation.
     fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs;
     /// Forcibly advances the elapsed time.
@@ -44,6 +44,7 @@ pub type HookeSpringSpeed = f64;
 /// To be specific, `position` and `velocity` will always be invalid if any of the properties become invalid.
 /// `target`, `damper` and `speed` will not be invalid, unless they are the source of the propagation.
 /// Elapsed time will not be invalid, unless `clock` was mutated to return an invalid value. 
+#[derive(Debug)]
 pub struct HookeSpring<T> {
     position: T,
     velocity: T,
