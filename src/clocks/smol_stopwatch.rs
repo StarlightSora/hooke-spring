@@ -7,6 +7,7 @@ use super::super::hooke_spring::HookeSpringClock;
 
 /// A wrapper around `std::time::Instant`, with added support for
 /// offsetting elapsed time and dilating the speed of time, through `time_skip` and `time_dilate`.
+#[derive(Debug)]
 pub struct SmolStopwatch {
     instant: Instant,
     last_evaluated_real: ElapsedTimeSecs,
