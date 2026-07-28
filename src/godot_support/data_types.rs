@@ -4,6 +4,8 @@ use godot::meta::conv::ByValue;
 use godot::meta::shape::GodotShape;
 use godot::prelude::*;
 
+// TODO: This module name is kind of misleading?
+
 // pull hooke_spring module into scope
 use super::super::hooke_spring;
 use hooke_spring::{HookeSpring, HookeSpringDamper, HookeSpringSpeed};
@@ -171,7 +173,7 @@ impl RSHookeSpring {
     }
     #[func]
     pub fn set_position_and_velocity(&mut self, position_to: HSCompatibleTypes, velocity_to: HSCompatibleTypes) {
-        hs_variant_match_double_typed!(&mut self.spring, HookeSpring::set_position_velocity, position_to, velocity_to)
+        hs_variant_match_double_typed!(&mut self.spring, HookeSpring::set_position_and_velocity, position_to, velocity_to)
     }
     // Getters //
     #[func]

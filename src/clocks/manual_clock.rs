@@ -6,7 +6,12 @@ use super::super::hooke_spring::HookeSpringClock;
 
 /// A clock that you are meant to call `time_skip` manually according to your use case
 /// to update its elapsed time.
+#[cfg(feature = "std")]
 #[derive(Debug)]
+pub struct ManualClock {
+    elapsed: ElapsedTimeSecs,
+}
+#[cfg(feature = "no_std")]
 pub struct ManualClock {
     elapsed: ElapsedTimeSecs,
 }
