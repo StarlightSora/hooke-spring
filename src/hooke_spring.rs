@@ -44,7 +44,18 @@ pub type HookeSpringSpeed = f64;
 /// To be specific, `position` and `velocity` will always be invalid if any of the properties become invalid.
 /// `target`, `damper` and `speed` will not be invalid, unless they are the source of the propagation.
 /// Elapsed time will not be invalid, unless `clock` was mutated to return an invalid value. 
+#[cfg(feature = "std")]
 #[derive(Debug)]
+pub struct HookeSpring<T> {
+    position: T,
+    velocity: T,
+    target: T,
+    damper: HookeSpringDamper,
+    speed: HookeSpringSpeed,
+    last_evaluated: ElapsedTimeSecs,
+    clock: WrappedHookeSpringClock,
+}
+#[cfg(feature = "no_std")]
 pub struct HookeSpring<T> {
     position: T,
     velocity: T,
@@ -225,12 +236,18 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// Modifies the `position` and `velocity` at the same time.
     /// 
     /// This only causes the instance to re-evaluate its elapsed time.
-    pub fn set_position_velocity(&mut self, position_to: T, velocity_to: T) {
+    pub fn set_position_and_velocity(&mut self, position_to: T, velocity_to: T) {
         // there is no point to call re_evaluate when we will overwrite both position and velocity anyways
         let elapsed = self.get_elapsed_time();
         self.position = position_to;
         self.velocity = velocity_to;
         self.update_last_evaluated(elapsed);
+    }
+
+    // Deprecated due to naming convention inconsistencies
+    #[deprecated(since="0.2.0-dev2", note="Use set_position_and_velocity instead!")]
+    pub fn set_position_velocity(&mut self, position_to: T, velocity_to: T) {
+        self.set_position_and_velocity(position_to, velocity_to);
     }
     
     /// Queries the `position`.
