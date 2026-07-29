@@ -44,18 +44,7 @@ pub type HookeSpringSpeed = f64;
 /// To be specific, `position` and `velocity` will always be invalid if any of the properties become invalid.
 /// `target`, `damper` and `speed` will not be invalid, unless they are the source of the propagation.
 /// Elapsed time will not be invalid, unless `clock` was mutated to return an invalid value. 
-#[cfg(feature = "std")]
 #[derive(Debug)]
-pub struct HookeSpring<T> {
-    position: T,
-    velocity: T,
-    target: T,
-    damper: HookeSpringDamper,
-    speed: HookeSpringSpeed,
-    last_evaluated: ElapsedTimeSecs,
-    clock: WrappedHookeSpringClock,
-}
-#[cfg(feature = "no_std")]
 pub struct HookeSpring<T> {
     position: T,
     velocity: T,
