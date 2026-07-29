@@ -1,5 +1,8 @@
+//! Contains macros to reduce boilerplate
+
 /// Assign necessary traits to newtypes; when multiplying $inner with f64, cast to $mul_precision for compatibility (typically f64 or f32)
 // TODO: Maybe split these? So the entire macro doesn't shoot itself on the foot if the original type doesn't have a trait here??
+#[macro_export]
 macro_rules! assign_spring_compat_traits {
     ($what: ident, $inner: ty, $mul_precision: ty) => {
         impl core::ops::Add<$what> for $what {
@@ -43,4 +46,4 @@ macro_rules! assign_spring_compat_traits {
         impl Copy for $what where $inner: Copy {}
     };
 }
-pub(super) use assign_spring_compat_traits;
+pub use assign_spring_compat_traits;

@@ -1,10 +1,11 @@
+// TODO: This module name is kind of misleading?
+
+// pull godot-rust shenanigans into scope
 use godot::classes::class_macros::private::virtuals::ZipReader::Variant;
 use godot::meta::Element;
 use godot::meta::conv::ByValue;
 use godot::meta::shape::GodotShape;
 use godot::prelude::*;
-
-// TODO: This module name is kind of misleading?
 
 // pull hooke_spring module into scope
 use super::super::hooke_spring;
@@ -12,9 +13,8 @@ use hooke_spring::{HookeSpring, HookeSpringDamper, HookeSpringSpeed};
 // pull ElapsedTimeSecs type into scope
 use super::super::clocks::units::ElapsedTimeSecs;
 
-// pull black magic spells into scope
-use super::macros::{hs_variant_match_typed, hs_variant_match_untyped, hs_variant_match_double_typed,
-    hs_variant_getter_generic_deref};
+// pull black magic spells (macro_rules!) into scope
+use super::macros::*;
 use super::super::macros::assign_spring_compat_traits;
 
 use std::fmt::Debug;

@@ -1,5 +1,8 @@
 //! You are entering the realm of black magic spells;
 //! dirty(?) macro hacks because Rust is overly strict
+//! and godot is the polar opposite of that
+//! 
+//! These macros are intended for use within the godot_support module
 
 // Is there really no better way to handle these? Seriously? This is idiomatic Rust?
 
