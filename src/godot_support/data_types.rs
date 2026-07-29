@@ -13,8 +13,9 @@ use hooke_spring::{HookeSpring, HookeSpringDamper, HookeSpringSpeed};
 use super::super::clocks::units::ElapsedTimeSecs;
 
 // pull black magic spells into scope
-use super::macros::{assign_spring_compat_traits, hs_variant_match_typed, hs_variant_match_untyped, hs_variant_match_double_typed,
+use super::macros::{hs_variant_match_typed, hs_variant_match_untyped, hs_variant_match_double_typed,
     hs_variant_getter_generic_deref};
+use super::super::macros::assign_spring_compat_traits;
 
 use std::fmt::Debug;
 use std::ops::{Add, AddAssign, Mul, MulAssign};
