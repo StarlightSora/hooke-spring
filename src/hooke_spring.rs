@@ -12,7 +12,7 @@ use super::clocks::units::ElapsedTimeSecs;
 /// Traits that constitute a `HookeSpringClock`.
 /// It is able to evaluate the elapsed time,
 /// and able to modify the elapsed time.
-pub trait HookeSpringClock: Send + Sync + core::fmt::Debug {
+pub trait HookeSpringClock: Send + Sync + core::fmt::Debug + HookeSpringClockClone {
     /// Evaluates how much time has passed since the instance's creation.
     fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs;
     /// Forcibly advances the elapsed time.
@@ -20,6 +20,22 @@ pub trait HookeSpringClock: Send + Sync + core::fmt::Debug {
 }
 /// Alias for a `HookeSpringClock` trait object wrapped in a `Box`.
 pub type WrappedHookeSpringClock = Box<dyn HookeSpringClock>;
+
+/// Trait used to make WrappedHookeSpringClock clonable. Implement using the clone trait object pattern.
+pub trait HookeSpringClockClone {
+    fn clone_box(&self) -> WrappedHookeSpringClock;
+}
+impl<T> HookeSpringClockClone for T
+where T: 'static + HookeSpringClock + Clone {
+    fn clone_box(&self) -> WrappedHookeSpringClock {
+        Box::new(self.clone())
+    }
+}
+impl Clone for WrappedHookeSpringClock {
+    fn clone(&self) -> Self {
+        self.clone_box()
+    }
+}
 
 /// Alias for `f64` for clarity.
 pub type HookeSpringDamper = f64;
@@ -45,6 +61,7 @@ pub type HookeSpringSpeed = f64;
 /// `target`, `damper` and `speed` will not be invalid, unless they are the source of the propagation.
 /// Elapsed time will not be invalid, unless `clock` was mutated to return an invalid value. 
 #[derive(Debug)]
+#[derive(Clone)]
 pub struct HookeSpring<T> {
     position: T,
     velocity: T,
@@ -83,7 +100,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// let mut spring = HookeSpring::<f64>::new(None, None, None, None, None, None);
     ///
     /// // Query its position and velocity
-    /// let (pos, vel) = spring.get_position_and_velocity();
+    /// let (pos, vel) = spring.position_and_velocity();
     /// assert_eq!(*pos, 0.0);
     /// assert_eq!(*vel, 0.0);
     /// ```
@@ -121,7 +138,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// spring.impulse(5.0);
     ///
     /// // After the impulse, velocity should be incremented
-    /// assert_eq!(*spring.get_velocity(), 5.0);
+    /// assert_eq!(*spring.velocity(), 5.0);
     /// ```
     pub fn impulse(&mut self, by: T) {
         self.re_evaluate_and_update();
@@ -145,7 +162,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// spring.time_skip(4.0);
     ///
     /// // 4 seconds should have elapsed on spring
-    /// assert_eq!(spring.get_elapsed_time(), 4.0);
+    /// assert_eq!(spring.elapsed_time(), 4.0);
     pub fn time_skip(&mut self, by: ElapsedTimeSecs) {
         self.clock.time_skip(by);
     }
@@ -166,16 +183,16 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// spring.set_target(10.0, Some(true));
     ///
     /// // Position and target are immediately updated
-    /// assert_eq!(*spring.get_position(), 10.0);
-    /// assert_eq!(*spring.get_target(), 10.0);
+    /// assert_eq!(*spring.position(), 10.0);
+    /// assert_eq!(*spring.target(), 10.0);
     /// 
     /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, None);
     /// // Set the target with animating
     /// spring.set_target(10.0, None);
     /// 
     /// // Only the target is updated
-    /// assert_eq!(*spring.get_position(), 0.0);
-    /// assert_eq!(*spring.get_target(), 10.0);
+    /// assert_eq!(*spring.position(), 0.0);
+    /// assert_eq!(*spring.target(), 10.0);
     /// ```
     pub fn set_target(&mut self, to: T, do_not_animate: Option<bool>) {
         let no_anim = do_not_animate.unwrap_or(false);
@@ -183,7 +200,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
             self.position = to;
             self.velocity *= 0.0;
             self.target = to;
-            let new_elapsed = self.get_elapsed_time();
+            let new_elapsed = self.elapsed_time();
             self.update_last_evaluated(new_elapsed);
         } else {
             self.re_evaluate_and_update();
@@ -201,14 +218,18 @@ for<'a> &'a T: Mul<f64, Output = T> {
         self.speed = to;
     }
     /// Modifies the `damper` and `speed` at the same time.
-    pub fn set_damper_and_speed(&mut self, damper_to: HookeSpringDamper, speed_to: HookeSpringSpeed) {
+    pub fn set_damper_speed(&mut self, damper_to: HookeSpringDamper, speed_to: HookeSpringSpeed) {
         self.re_evaluate_and_update();
         self.damper = damper_to;
         self.speed = speed_to;
     }
+    #[deprecated(since="0.2.0-dev2", note="Use Self::set_damper_speed instead!")] // Deprecated due to naming inconsistencies
+    pub fn set_damper_and_speed(&mut self, damper_to: HookeSpringDamper, speed_to: HookeSpringSpeed) {
+        self.set_damper_speed(damper_to, speed_to);
+    }
     /// Modifies the `position`.
     pub fn set_position(&mut self, to: T) {
-        let elapsed = self.get_elapsed_time();
+        let elapsed = self.elapsed_time();
         let (_, vel) = self.re_evaluate(&elapsed);
         self.position = to;
         self.velocity = vel;
@@ -216,7 +237,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     }
     /// Modifies the `velocity`.
     pub fn set_velocity(&mut self, to: T) {
-        let elapsed = self.get_elapsed_time();
+        let elapsed = self.elapsed_time();
         let (pos, _) = self.re_evaluate(&elapsed);
         self.position = pos;
         self.velocity = to;
@@ -225,52 +246,78 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// Modifies the `position` and `velocity` at the same time.
     /// 
     /// This only causes the instance to re-evaluate its elapsed time.
-    pub fn set_position_and_velocity(&mut self, position_to: T, velocity_to: T) {
+    pub fn set_position_velocity(&mut self, position_to: T, velocity_to: T) {
         // there is no point to call re_evaluate when we will overwrite both position and velocity anyways
-        let elapsed = self.get_elapsed_time();
+        let elapsed = self.elapsed_time();
         self.position = position_to;
         self.velocity = velocity_to;
         self.update_last_evaluated(elapsed);
     }
-
-    // Deprecated due to naming convention inconsistencies
-    #[deprecated(since="0.2.0-dev2", note="Use set_position_and_velocity instead!")]
-    pub fn set_position_velocity(&mut self, position_to: T, velocity_to: T) {
-        self.set_position_and_velocity(position_to, velocity_to);
+    #[deprecated(since="0.2.0-dev2", note="Use Self::set_position_velocity instead!")] // Deprecated due to naming inconsistencies
+    pub fn set_position_and_velocity(&mut self, position_to: T, velocity_to: T) {
+        self.set_position_velocity(position_to, velocity_to);
     }
     
     /// Queries the `position`.
-    pub fn get_position(&mut self) -> &T {
+    pub fn position(&mut self) -> &T {
         self.re_evaluate_and_update();
         &self.position
     }
+    #[deprecated(since="0.2.0-dev2", note="Use Self::position instead!")] // Deprecated due to violating C-GETTER
+    pub fn get_position(&mut self) -> &T {
+        self.position()
+    }
     /// Queries the `velocity`.
-    pub fn get_velocity(&mut self) -> &T {
+    pub fn velocity(&mut self) -> &T {
         self.re_evaluate_and_update();
         &self.velocity
     }
+    #[deprecated(since="0.2.0-dev2", note="Use Self::velocity instead!")] // Deprecated due to violating C-GETTER
+    pub fn get_velocity(&mut self) -> &T {
+        self.velocity()
+    }
     /// Queries the `position` and `velocity` at the same time.
-    pub fn get_position_and_velocity(&mut self) -> (&T, &T) {
+    pub fn position_velocity(&mut self) -> (&T, &T) {
         self.re_evaluate_and_update();
         (&self.position, &self.velocity)
     }
+    #[deprecated(since="0.2.0-dev2", note="Use Self::position_velocity instead!")] // Deprecated due to violating C-GETTER
+    pub fn get_position_and_velocity(&mut self) -> (&T, &T) {
+        self.position_velocity()
+    }
     /// Queries the `target`.
-    pub fn get_target(&self) -> &T {
+    pub fn target(&self) -> &T {
         &self.target
     }
+    #[deprecated(since="0.2.0-dev2", note="Use Self::target instead!")] // Deprecated due to violating C-GETTER
+    pub fn get_target(&self) -> &T {
+        self.target()
+    }
     /// Queries the `damper`.
-    pub fn get_damper(&self) -> &HookeSpringDamper {
+    pub fn damper(&self) -> &HookeSpringDamper {
         &self.damper
     }
+    #[deprecated(since="0.2.0-dev2", note="Use Self::damper instead!")] // Deprecated due to violating C-GETTER
+    pub fn get_damper(&self) -> &HookeSpringDamper {
+        self.damper()
+    }
     /// Queries the `speed`.
-    pub fn get_speed(&self) -> &HookeSpringSpeed {
+    pub fn speed(&self) -> &HookeSpringSpeed {
         &self.speed
+    }
+    #[deprecated(since="0.2.0-dev2", note="Use Self::speed instead!")] // Deprecated due to violating C-GETTER
+    pub fn get_speed(&self) -> &HookeSpringSpeed {
+        self.speed()
     }
     /// Queries how long the instance has been simulating for.
     /// 
     /// This only causes the instance to re-evaluate its elapsed time.
-    pub fn get_elapsed_time(&mut self) -> ElapsedTimeSecs {
+    pub fn elapsed_time(&mut self) -> ElapsedTimeSecs {
         self.clock.evaluate_elapsed()
+    }
+    #[deprecated(since="0.2.0-dev2", note="Use Self::elapsed_time instead!")] // Deprecated due to violating C-GETTER
+    pub fn get_elapsed_time(&mut self) -> ElapsedTimeSecs {
+        self.elapsed_time()
     }
 
     /// Provides a mutable reference to the `clock`.
@@ -283,7 +330,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
 
     // wrapper for calling `re_evaluate`, updating `position` and `velocity`, then calling `update_last_evaluated`
     fn re_evaluate_and_update(&mut self) {
-        let elapsed = self.get_elapsed_time();
+        let elapsed = self.elapsed_time();
         let (new_position, new_velocity) = self.re_evaluate(&elapsed);
         self.position = new_position;
         self.velocity = new_velocity;

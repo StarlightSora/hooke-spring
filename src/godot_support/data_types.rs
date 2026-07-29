@@ -161,8 +161,8 @@ impl RSHookeSpring {
         hs_variant_match_untyped!(&mut self.spring, HookeSpring::set_speed, to)
     }
     #[func]
-    pub fn set_damper_and_speed(&mut self, damper_to: HookeSpringDamper, speed_to: HookeSpringSpeed) {
-        hs_variant_match_untyped!(&mut self.spring, HookeSpring::set_damper_and_speed, damper_to, speed_to)
+    pub fn set_damper_speed(&mut self, damper_to: HookeSpringDamper, speed_to: HookeSpringSpeed) {
+        hs_variant_match_untyped!(&mut self.spring, HookeSpring::set_damper_speed, damper_to, speed_to)
     }
     #[func]
     pub fn set_position(&mut self, to: HSCompatibleTypes) {
@@ -173,21 +173,21 @@ impl RSHookeSpring {
         hs_variant_match_typed!(&mut self.spring, HookeSpring::set_velocity, to)
     }
     #[func]
-    pub fn set_position_and_velocity(&mut self, position_to: HSCompatibleTypes, velocity_to: HSCompatibleTypes) {
-        hs_variant_match_double_typed!(&mut self.spring, HookeSpring::set_position_and_velocity, position_to, velocity_to)
+    pub fn set_position_velocity(&mut self, position_to: HSCompatibleTypes, velocity_to: HSCompatibleTypes) {
+        hs_variant_match_double_typed!(&mut self.spring, HookeSpring::set_position_velocity, position_to, velocity_to)
     }
     // Getters //
     #[func]
     pub fn get_position(&mut self) -> HSCompatibleTypes {
-        hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::get_position)
+        hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::position)
     }
     #[func]
     pub fn get_velocity(&mut self) -> HSCompatibleTypes {
-        hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::get_velocity)
+        hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::velocity)
     }
     #[func]
     pub fn get_position_and_velocity(&mut self) -> Array<HSCompatibleTypes> {
-        let (pos, vel) = hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::get_position_and_velocity, true);
+        let (pos, vel) = hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::position_velocity, true);
         let mut arr = Array::new();
         arr.push(pos);
         arr.push(vel);
@@ -195,19 +195,19 @@ impl RSHookeSpring {
     }
     #[func]
     pub fn get_target(&mut self) -> HSCompatibleTypes {
-        hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::get_target)
+        hs_variant_getter_generic_deref!(&mut self.spring, HookeSpring::target)
     }
     #[func]
     pub fn get_damper(&mut self) -> f64 {
-        *hs_variant_match_untyped!(&mut self.spring, HookeSpring::get_damper)
+        *hs_variant_match_untyped!(&mut self.spring, HookeSpring::damper)
     }
     #[func]
     pub fn get_speed(&mut self) -> f64 {
-        *hs_variant_match_untyped!(&mut self.spring, HookeSpring::get_speed)
+        *hs_variant_match_untyped!(&mut self.spring, HookeSpring::speed)
     }
     #[func]
     pub fn get_elapsed_time(&mut self) -> f64 {
-        hs_variant_match_untyped!(&mut self.spring, HookeSpring::get_elapsed_time)
+        hs_variant_match_untyped!(&mut self.spring, HookeSpring::elapsed_time)
     }
 
     // clock_mut // 
