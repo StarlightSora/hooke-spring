@@ -17,7 +17,7 @@ pub struct SmolStopwatch {
 }
 impl HookeSpringClock for SmolStopwatch {
     fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs {
-        let raw_elapsed_time = self.get_real_elapsed();
+        let raw_elapsed_time = self.real_elapsed();
         let raw_elapsed_diff = raw_elapsed_time - self.last_evaluated_real;
         
         let dilated_time_diff = raw_elapsed_diff * self.time_scale;
@@ -56,13 +56,17 @@ impl SmolStopwatch {
     }
 
     /// Queries the `time_scale`.
-    pub fn get_time_scale(&self) -> &f64 {
+    pub fn time_scale(&self) -> &f64 {
         &self.time_scale
     }
+    #[deprecated(since="0.2.0-dev2", note="Use Self::time_scale instead!")] // Deprecated due to violating C-GETTER
+    pub fn get_time_scale(&self) -> &f64 { self.time_scale() }
     /// Queries how much real-life time elapsed according to `std::Time::Instant`.
-    pub fn get_real_elapsed(&self) -> ElapsedTimeSecs {
+    pub fn real_elapsed(&self) -> ElapsedTimeSecs {
         self.instant.elapsed().as_secs_f64()
     }
+    #[deprecated(since="0.2.0-dev2", note="Use Self::real_elapsed instead!")] // Deprecated due to violating C-GETTER
+    pub fn get_real_elapsed(&self) -> ElapsedTimeSecs { self.real_elapsed() }
 
     /// Modifies the `time_scale`.
     /// 
