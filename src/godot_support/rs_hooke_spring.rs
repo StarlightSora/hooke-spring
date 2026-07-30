@@ -1,5 +1,3 @@
-// TODO: This module name is kind of misleading?
-
 // pull godot-rust shenanigans into scope
 use godot::classes::class_macros::private::virtuals::ZipReader::Variant;
 use godot::meta::Element;
