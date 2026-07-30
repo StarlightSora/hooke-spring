@@ -76,8 +76,33 @@ pub struct GDRSStopwatch {
 #[godot_api]
 impl GDRSStopwatch {
     #[func]
+    pub fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs {
+        self.inner.evaluate_elapsed()
+    }
+    #[func]
+    pub fn time_skip(&mut self, by: ElapsedTimeSecs) {
+        self.inner.time_skip(by)
+    }
+
+    #[func]
     pub fn get_time_scale(&self) -> f64 {
         *self.inner.time_scale()
+    }
+    #[func]
+    pub fn get_real_elapsed(&self) -> ElapsedTimeSecs {
+        self.inner.real_elapsed()
+    }
+    #[func]
+    pub fn time_dilate(&mut self, multiplier: f64) {
+        self.inner.time_dilate(multiplier)
+    }
+    #[func]
+    pub fn time_skip_raw(&mut self, by: ElapsedTimeSecs) {
+        self.inner.time_skip_raw(by)
+    }
+
+    pub fn inner_clone(&self) -> InnerGDRSStopwatch {
+        self.inner.clone()
     }
 }
 

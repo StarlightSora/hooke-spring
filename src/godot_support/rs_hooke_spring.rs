@@ -15,13 +15,23 @@ use super::super::clocks::units::ElapsedTimeSecs;
 use super::macros::*;
 use super::super::macros::assign_spring_compat_traits;
 
+use super::gdrs_stopwatch::*;
+
 use std::fmt::Debug;
 use std::ops::{Add, AddAssign, Mul, MulAssign};
-fn make_new_spring<T>(damper: Option<HookeSpringDamper>, speed: Option<HookeSpringSpeed>) -> HookeSpring<T>
+fn make_new_spring<T>(damper: Option<HookeSpringDamper>, speed: Option<HookeSpringSpeed>, clock: Option<Gd<GDRSStopwatch>>) -> HookeSpring<T>
 where T: Default + Copy + AddAssign + Add<T, Output = T> + Mul<f64, Output = T> + MulAssign<f64>,
 for<'a> &'a T: Mul<f64, Output = T> {
     // TODO: None is a placeholder, replace with Godot's timekeeper instead
-    HookeSpring::<T>::from_damper_speed(damper.unwrap_or(1.0), speed.unwrap_or(1.0), None)
+    let clock_to_inject: InnerGDRSStopwatch = match clock {
+        Some(gd_instance) => {
+            gd_instance.bind().inner_clone()
+        }
+        None => {
+            InnerGDRSStopwatch::new()
+        }
+    };
+    HookeSpring::<T>::from_damper_speed(damper.unwrap_or(1.0), speed.unwrap_or(1.0), Some(Box::new(clock_to_inject)))
 }
 
 #[derive(Debug)]
@@ -90,7 +100,7 @@ pub enum RSHookeSpringVariant {
 }
 impl Default for RSHookeSpringVariant {
     fn default() -> Self {
-        RSHookeSpringVariant::Float(make_new_spring::<HSFloat>(None, None))
+        RSHookeSpringVariant::Float(make_new_spring::<HSFloat>(None, None, None))
     }
 }
 
@@ -98,37 +108,37 @@ impl Default for RSHookeSpringVariant {
 #[class(base=RefCounted, init)]
 pub struct RSHookeSpring {
     spring: RSHookeSpringVariant,
-    base: Base<RefCounted>
+    base: Base<RefCounted>,
 }
 
 #[godot_api]
 impl RSHookeSpring {
     // Constructors //
     #[func]
-    pub fn new_float(damper: HookeSpringDamper, speed: HookeSpringSpeed) -> Gd<Self> {
+    pub fn new_float(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<GDRSStopwatch>>) -> Gd<Self> {
         Gd::from_init_fn(|base| Self {
-            spring: RSHookeSpringVariant::Float(make_new_spring::<HSFloat>(Some(damper), Some(speed))),
+            spring: RSHookeSpringVariant::Float(make_new_spring::<HSFloat>(Some(damper), Some(speed), clock)),
             base,
         })
     }
     #[func]
-    pub fn new_vector2(damper: HookeSpringDamper, speed: HookeSpringSpeed) -> Gd<Self> {
+    pub fn new_vector2(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<GDRSStopwatch>>) -> Gd<Self> {
         Gd::from_init_fn(|base| Self {
-            spring: RSHookeSpringVariant::Vector2(make_new_spring::<HSVector2>(Some(damper), Some(speed))),
+            spring: RSHookeSpringVariant::Vector2(make_new_spring::<HSVector2>(Some(damper), Some(speed), clock)),
             base,
         })
     }
     #[func]
-    pub fn new_vector3(damper: HookeSpringDamper, speed: HookeSpringSpeed) -> Gd<Self> {
+    pub fn new_vector3(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<GDRSStopwatch>>) -> Gd<Self> {
         Gd::from_init_fn(|base| Self {
-            spring: RSHookeSpringVariant::Vector3(make_new_spring::<HSVector3>(Some(damper), Some(speed))),
+            spring: RSHookeSpringVariant::Vector3(make_new_spring::<HSVector3>(Some(damper), Some(speed), clock)),
             base,
         })
     }
     #[func]
-    pub fn new_vector4(damper: HookeSpringDamper, speed: HookeSpringSpeed) -> Gd<Self> {
+    pub fn new_vector4(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<GDRSStopwatch>>) -> Gd<Self> {
         Gd::from_init_fn(|base| Self {
-            spring: RSHookeSpringVariant::Vector4(make_new_spring::<HSVector4>(Some(damper), Some(speed))),
+            spring: RSHookeSpringVariant::Vector4(make_new_spring::<HSVector4>(Some(damper), Some(speed), clock)),
             base,
         })
     }
