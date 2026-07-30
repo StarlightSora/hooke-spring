@@ -213,6 +213,16 @@ impl RSHookeSpring {
     pub fn get_elapsed_time(&mut self) -> f64 {
         hs_variant_match_untyped!(&mut self.spring, HookeSpring::elapsed_time)
     }
+    #[func]
+    pub fn get_clock_copy(&self) -> Gd<GDRSStopwatch> {
+        let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
+        if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
+            GDRSStopwatch::from_inner(inner)
+        } else {
+            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            GDRSStopwatch::new_running()
+        }
+    } 
 
     #[func]
     pub fn time_skip(&mut self, by: ElapsedTimeSecs) {

@@ -77,8 +77,8 @@ impl InnerGDRSStopwatch {
 #[derive(GodotClass)]
 #[class(base=Resource, no_init)]
 pub struct GDRSStopwatch {
-    inner: InnerGDRSStopwatch,
-    base: Base<Resource>,
+    pub inner: InnerGDRSStopwatch,
+    pub base: Base<Resource>,
 }
 
 #[godot_api]
@@ -97,6 +97,15 @@ impl GDRSStopwatch {
         Gd::from_init_fn(|base| {
             Self {
                 inner: InnerGDRSStopwatch::new_stopped(),
+                base,
+            }
+        })
+    }
+
+    pub fn from_inner(inner: &InnerGDRSStopwatch) -> Gd<Self> {
+        Gd::from_init_fn(|base| {
+            Self {
+                inner: inner.clone(),
                 base,
             }
         })
