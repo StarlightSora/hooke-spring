@@ -257,13 +257,52 @@ impl RSHookeSpring {
         }
     }
     #[func]
-    pub fn get_engine_elapsed_time(&self) -> f64 {
+    pub fn get_engine_elapsed_time(&self) -> ElapsedTimeSecs {
         let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
         if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
             inner.real_elapsed()
         } else {
             godot_error!("Expected InnerGDRSStopwatch, got something else");
             0.0f64
+        }
+    }
+    #[func]
+    pub fn get_created_time(&self) -> ElapsedTimeSecs {
+        let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
+        if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
+            inner.created_time()
+        } else {
+            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            0.0f64
+        }
+    }
+
+    #[func]
+    pub fn is_paused(&self) -> bool {
+        let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
+        if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
+            inner.is_paused()
+        } else {
+            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            false
+        }
+    }
+    #[func]
+    pub fn pause(&mut self) {
+        let clock_mut = hs_variant_match_untyped!(&mut self.spring, HookeSpring::clock_mut);
+        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerGDRSStopwatch>() {
+            inner.pause();
+        } else {
+            godot_error!("Expected InnerGDRSStopwatch, got something else");
+        }
+    }
+    #[func]
+    pub fn resume(&mut self) {
+        let clock_mut = hs_variant_match_untyped!(&mut self.spring, HookeSpring::clock_mut);
+        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerGDRSStopwatch>() {
+            inner.resume();
+        } else {
+            godot_error!("Expected InnerGDRSStopwatch, got something else");
         }
     }
 }

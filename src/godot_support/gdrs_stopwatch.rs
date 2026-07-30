@@ -14,20 +14,25 @@ pub struct InnerGDRSStopwatch {
     last_evaluated_real: ElapsedTimeSecs,
     last_effective_time: ElapsedTimeSecs,
     time_scale: f64,
+    paused: bool,
 }
 impl HookeSpringClock for InnerGDRSStopwatch {
     fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs {
-        let raw_elapsed_time = self.real_elapsed();
-        let raw_elapsed_diff = raw_elapsed_time - self.last_evaluated_real;
-        
-        let dilated_time_diff = raw_elapsed_diff * self.time_scale;
-        self.last_effective_time += dilated_time_diff;
-        self.last_evaluated_real = raw_elapsed_time;
+        if self.paused {
+            self.last_effective_time
+        } else {
+            let raw_elapsed_time = self.real_elapsed();
+            let raw_elapsed_diff = raw_elapsed_time - self.last_evaluated_real;
+            
+            let dilated_time_diff = raw_elapsed_diff * self.time_scale;
+            self.last_effective_time += dilated_time_diff;
+            self.last_evaluated_real = raw_elapsed_time;
 
-        self.last_effective_time
+            self.last_effective_time
+        }
     }
     fn time_skip(&mut self, by: ElapsedTimeSecs) {
-        self.evaluate_elapsed();
+        if !self.paused { self.evaluate_elapsed(); }
         self.last_effective_time += by * self.time_scale;
     }
 }
@@ -43,6 +48,7 @@ impl InnerGDRSStopwatch {
             last_evaluated_real: 0.0,
             last_effective_time: 0.0,
             time_scale: 1.0,
+            paused: false,
         }
     }
     pub fn new_stopped() -> Self {
@@ -50,13 +56,17 @@ impl InnerGDRSStopwatch {
             created: usec_to_ets(Time::singleton().get_ticks_usec()),
             last_evaluated_real: 0.0,
             last_effective_time: 0.0,
-            time_scale: 0.0,
+            time_scale: 1.0,
+            paused: true,
         }
     }
     pub fn wrapped() -> Box<Self> {
         Box::new(Self::new())
     }
 
+    pub fn created_time(&self) -> ElapsedTimeSecs {
+        self.created
+    }
     pub fn time_scale(&self) -> &f64 {
         &self.time_scale
     }
@@ -64,13 +74,36 @@ impl InnerGDRSStopwatch {
         usec_to_ets(Time::singleton().get_ticks_usec()) - self.created
     }
 
+    pub fn is_paused(&self) -> bool {
+        self.paused
+    }
+    pub fn pause(&mut self) {
+        if !self.paused {
+            self.evaluate_elapsed();
+            self.paused = true;
+        }
+    }
+    pub fn resume(&mut self) {
+        if self.paused {
+            // There should be no reason to `evaluate_elapsed()` on a stopwatch that was paused earlier
+            // However we need to set last_evaluated_real to the current engine time so downstream calculations are accurate
+            self.last_evaluated_real = self.real_elapsed();
+            self.paused = false;
+        }
+    }
+
     pub fn time_dilate(&mut self, multiplier: f64) {
-        self.evaluate_elapsed();
+        if !self.paused { self.evaluate_elapsed(); }
         self.time_scale = multiplier;
     }
     pub fn time_skip_raw(&mut self, by: ElapsedTimeSecs) {
-        self.evaluate_elapsed();
+        if !self.paused { self.evaluate_elapsed(); }
         self.last_effective_time += by;
+    }
+
+    pub fn reset(&mut self) {
+        self.last_evaluated_real = self.real_elapsed();
+        self.last_effective_time = 0.0f64;
     }
 }
 
@@ -121,6 +154,10 @@ impl GDRSStopwatch {
     }
 
     #[func]
+    pub fn get_created_time(&self) -> f64 {
+        self.inner.created_time()
+    }
+    #[func]
     pub fn get_time_scale(&self) -> f64 {
         *self.inner.time_scale()
     }
@@ -128,6 +165,20 @@ impl GDRSStopwatch {
     pub fn get_real_elapsed(&self) -> ElapsedTimeSecs {
         self.inner.real_elapsed()
     }
+
+    #[func]
+    pub fn is_paused(&self) -> bool {
+        self.inner.is_paused()
+    }
+    #[func]
+    pub fn pause(&mut self) {
+        self.inner.pause();
+    }
+    #[func]
+    pub fn resume(&mut self) {
+        self.inner.resume();
+    }
+
     #[func]
     pub fn time_dilate(&mut self, multiplier: f64) {
         self.inner.time_dilate(multiplier)
@@ -135,6 +186,11 @@ impl GDRSStopwatch {
     #[func]
     pub fn time_skip_raw(&mut self, by: ElapsedTimeSecs) {
         self.inner.time_skip_raw(by)
+    }
+
+    #[func]
+    pub fn reset(&mut self) {
+        self.inner.reset()
     }
 
     pub fn inner_clone(&self) -> InnerGDRSStopwatch {
