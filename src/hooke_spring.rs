@@ -2,6 +2,7 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use core::ops::{Add, AddAssign, Mul, MulAssign};
+use core::any::Any;
 use crate::ManualClock;
 
 #[cfg(feature = "libm")]
@@ -12,11 +13,24 @@ use super::clocks::units::ElapsedTimeSecs;
 /// Traits that constitute a `HookeSpringClock`.
 /// It is able to evaluate the elapsed time,
 /// and able to modify the elapsed time.
-pub trait HookeSpringClock: Send + Sync + core::fmt::Debug + HookeSpringClockClone {
+pub trait HookeSpringClock: Send + Sync + core::fmt::Debug + HookeSpringClockClone + HookeSpringClockAsAny {
     /// Evaluates how much time has passed since the instance's creation.
     fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs;
     /// Forcibly advances the elapsed time.
     fn time_skip(&mut self, by: ElapsedTimeSecs);
+}
+pub trait HookeSpringClockAsAny {
+    fn as_any_mut(&mut self) -> &mut dyn Any;
+    fn as_any(&self) -> &dyn Any;
+}
+impl<T> HookeSpringClockAsAny for T
+where T: 'static + HookeSpringClock {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn as_any_mut(&mut self) -> &mut dyn Any {
+        self
+    }
 }
 /// Alias for a `HookeSpringClock` trait object wrapped in a `Box`.
 pub type WrappedHookeSpringClock = Box<dyn HookeSpringClock>;

@@ -7,7 +7,7 @@ use godot::prelude::*;
 
 // pull hooke_spring module into scope
 use super::super::hooke_spring;
-use hooke_spring::{HookeSpring, HookeSpringDamper, HookeSpringSpeed};
+use hooke_spring::{HookeSpring, HookeSpringDamper, HookeSpringSpeed, HookeSpringClockAsAny, HookeSpringClock};
 // pull ElapsedTimeSecs type into scope
 use super::super::clocks::units::ElapsedTimeSecs;
 
@@ -17,12 +17,11 @@ use super::super::macros::assign_spring_compat_traits;
 
 use super::gdrs_stopwatch::*;
 
-use std::fmt::Debug;
-use std::ops::{Add, AddAssign, Mul, MulAssign};
+use core::fmt::Debug;
+use core::ops::{Add, AddAssign, Mul, MulAssign};
 fn make_new_spring<T>(damper: Option<HookeSpringDamper>, speed: Option<HookeSpringSpeed>, clock: Option<Gd<GDRSStopwatch>>) -> HookeSpring<T>
 where T: Default + Copy + AddAssign + Add<T, Output = T> + Mul<f64, Output = T> + MulAssign<f64>,
 for<'a> &'a T: Mul<f64, Output = T> {
-    // TODO: None is a placeholder, replace with Godot's timekeeper instead
     let clock_to_inject: InnerGDRSStopwatch = match clock {
         Some(gd_instance) => {
             gd_instance.bind().inner_clone()
@@ -31,7 +30,8 @@ for<'a> &'a T: Mul<f64, Output = T> {
             InnerGDRSStopwatch::new()
         }
     };
-    HookeSpring::<T>::from_damper_speed(damper.unwrap_or(1.0), speed.unwrap_or(1.0), Some(Box::new(clock_to_inject)))
+    let boxed_clock: Box<dyn HookeSpringClock> = Box::new(clock_to_inject);
+    HookeSpring::<T>::from_damper_speed(damper.unwrap_or(1.0), speed.unwrap_or(1.0), Some(boxed_clock))
 }
 
 #[derive(Debug)]
@@ -153,10 +153,6 @@ impl RSHookeSpring {
         hs_variant_match_typed!(&mut self.spring, HookeSpring::shift, by)
     }
     #[func]
-    pub fn time_skip(&mut self, by: ElapsedTimeSecs) {
-        hs_variant_match_untyped!(&mut self.spring, HookeSpring::time_skip, by)
-    }
-    #[func]
     pub fn set_target(&mut self, to: HSCompatibleTypes, do_not_animate: bool) {
         hs_variant_match_typed!(&mut self.spring, HookeSpring::set_target, to, Some(do_not_animate))
     }
@@ -218,10 +214,18 @@ impl RSHookeSpring {
         hs_variant_match_untyped!(&mut self.spring, HookeSpring::elapsed_time)
     }
 
-    // clock_mut // 
-    pub fn clock_mut(&mut self) {
-        // TODO: Figure out what the hell to link as the `clock` for Godot's case first
-        unimplemented!()
+    #[func]
+    pub fn time_skip(&mut self, by: ElapsedTimeSecs) {
+        hs_variant_match_untyped!(&mut self.spring, HookeSpring::time_skip, by)
+    }
+    #[func]
+    pub fn time_dilate(&mut self, multiplier: f64) {
+        let clock_mut = hs_variant_match_untyped!(&mut self.spring, HookeSpring::clock_mut);
+        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerGDRSStopwatch>() {
+            inner.time_dilate(multiplier);
+        } else {
+            godot_error!("Expected InnerGDRSStopwatch, got something else");
+        }
     }
 }
 

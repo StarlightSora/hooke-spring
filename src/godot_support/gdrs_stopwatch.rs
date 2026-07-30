@@ -45,6 +45,14 @@ impl InnerGDRSStopwatch {
             time_scale: 1.0,
         }
     }
+    pub fn new_stopped() -> Self {
+        Self {
+            created: usec_to_ets(Time::singleton().get_ticks_usec()),
+            last_evaluated_real: 0.0,
+            last_effective_time: 0.0,
+            time_scale: 0.0,
+        }
+    }
     pub fn wrapped() -> Box<Self> {
         Box::new(Self::new())
     }
@@ -67,7 +75,7 @@ impl InnerGDRSStopwatch {
 }
 
 #[derive(GodotClass)]
-#[class(base=Resource, init)]
+#[class(base=Resource, no_init)]
 pub struct GDRSStopwatch {
     inner: InnerGDRSStopwatch,
     base: Base<Resource>,
@@ -75,6 +83,25 @@ pub struct GDRSStopwatch {
 
 #[godot_api]
 impl GDRSStopwatch {
+    #[func]
+    pub fn new_running() -> Gd<Self> {
+        Gd::from_init_fn(|base| {
+            Self {
+                inner: InnerGDRSStopwatch::new(),
+                base,
+            }
+        })
+    }
+    #[func]
+    pub fn new_manual() -> Gd<Self> {
+        Gd::from_init_fn(|base| {
+            Self {
+                inner: InnerGDRSStopwatch::new_stopped(),
+                base,
+            }
+        })
+    }
+
     #[func]
     pub fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs {
         self.inner.evaluate_elapsed()
