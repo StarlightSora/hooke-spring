@@ -13,7 +13,9 @@ use super::clocks::units::ElapsedTimeSecs;
 /// Traits that constitute a `HookeSpringClock`.
 /// It is able to evaluate the elapsed time,
 /// and able to modify the elapsed time.
-pub trait HookeSpringClock: Send + Sync + core::fmt::Debug + HookeSpringClockClone + HookeSpringClockAsAny {
+pub trait HookeSpringClock: Send + Sync + core::fmt::Debug +
+HookeSpringClockClone + HookeSpringClockAsAny
+{
     /// Evaluates how much time has passed since the instance's creation.
     fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs;
     /// Forcibly advances the elapsed time.
@@ -24,7 +26,7 @@ pub trait HookeSpringClockAsAny {
     fn as_any(&self) -> &dyn Any;
 }
 impl<T> HookeSpringClockAsAny for T
-where T: 'static + HookeSpringClock {
+where T: HookeSpringClock + 'static {
     fn as_any(&self) -> &dyn Any {
         self
     }
@@ -40,7 +42,7 @@ pub trait HookeSpringClockClone {
     fn clone_box(&self) -> WrappedHookeSpringClock;
 }
 impl<T> HookeSpringClockClone for T
-where T: 'static + HookeSpringClock + Clone {
+where T: HookeSpringClock + 'static + Clone {
     fn clone_box(&self) -> WrappedHookeSpringClock {
         Box::new(self.clone())
     }
@@ -340,6 +342,12 @@ for<'a> &'a T: Mul<f64, Output = T> {
     pub fn clock_mut(&mut self) -> &mut WrappedHookeSpringClock {
         self.re_evaluate_and_update();
         &mut self.clock
+    }
+    /// Provides a reference to the `clock`.
+    /// 
+    /// Typically not very useful except when you need to call a getter that doesn't mutate the clock.
+    pub fn clock(&self) -> &WrappedHookeSpringClock {
+        &self.clock
     }
 
     // wrapper for calling `re_evaluate`, updating `position` and `velocity`, then calling `update_last_evaluated`

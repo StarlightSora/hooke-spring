@@ -7,7 +7,7 @@ use godot::prelude::*;
 
 // pull hooke_spring module into scope
 use super::super::hooke_spring;
-use hooke_spring::{HookeSpring, HookeSpringDamper, HookeSpringSpeed, HookeSpringClockAsAny, HookeSpringClock};
+use hooke_spring::{HookeSpring, HookeSpringDamper, HookeSpringSpeed, HookeSpringClock};
 // pull ElapsedTimeSecs type into scope
 use super::super::clocks::units::ElapsedTimeSecs;
 
@@ -225,6 +225,35 @@ impl RSHookeSpring {
             inner.time_dilate(multiplier);
         } else {
             godot_error!("Expected InnerGDRSStopwatch, got something else");
+        }
+    }
+    #[func]
+    pub fn time_skip_raw(&mut self, by: ElapsedTimeSecs) {
+        let clock_mut = hs_variant_match_untyped!(&mut self.spring, HookeSpring::clock_mut);
+        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerGDRSStopwatch>() {
+            inner.time_skip_raw(by);
+        } else {
+            godot_error!("Expected InnerGDRSStopwatch, got something else");
+        }
+    }
+    #[func]
+    pub fn get_time_scale(&self) -> f64 {
+        let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
+        if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
+            *inner.time_scale()
+        } else {
+            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            1.0f64
+        }
+    }
+    #[func]
+    pub fn get_engine_elapsed_time(&self) -> f64 {
+        let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
+        if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
+            inner.real_elapsed()
+        } else {
+            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            0.0f64
         }
     }
 }
