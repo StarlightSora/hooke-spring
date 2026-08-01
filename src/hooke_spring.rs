@@ -116,7 +116,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// let mut spring = HookeSpring::<f64>::new(None, None, None, None, None, None);
     ///
     /// // Query its position and velocity
-    /// let (pos, vel) = spring.position_and_velocity();
+    /// let (pos, vel) = spring.position_velocity();
     /// assert_eq!(*pos, 0.0);
     /// assert_eq!(*vel, 0.0);
     /// ```
