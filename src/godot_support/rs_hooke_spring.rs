@@ -128,7 +128,7 @@ assign_spring_compat_traits_gdmatrix!(HSQuaternion, Quaternion);
 impl Mul<f64> for HSQuaternion {
     type Output = HSQuaternion;
     fn mul(self, rhs: f64) -> Self::Output {
-        HSQuaternion(Quaternion::IDENTITY.slerp(self.0, rhs as f32)) // Why borrow for Quaternion but owned for everything else? WTH??
+        HSQuaternion(Quaternion::IDENTITY.slerp(self.0.normalized(), rhs as f32))
     }
 }
 impl MulAssign<f64> for HSQuaternion {
@@ -141,7 +141,7 @@ impl MulAssign<f64> for HSQuaternion {
 impl<'a> Mul<f64> for &'a HSQuaternion {
     type Output = HSQuaternion;
     fn mul(self, rhs: f64) -> Self::Output {
-        HSQuaternion(Quaternion::IDENTITY.slerp(self.0, rhs as f32))
+        HSQuaternion(Quaternion::IDENTITY.slerp(self.0.normalized(), rhs as f32))
     }
 }
 
