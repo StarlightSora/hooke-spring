@@ -184,8 +184,12 @@ macro_rules! hs_variant_getter_generic_deref {
 pub(super) use hs_variant_getter_generic_deref;
 
 /// Similar to `assign_spring_compat_traits_all!`, but specifically designed for Godot matrix data types
+/// 
+/// Mul-related traits need to be manually assigned.
+/// This is because naively multiplying these data types with a float
+/// is clearly not what you ever want to do.
 macro_rules! assign_spring_compat_traits_gdmatrix {
-    ($what: ident, $inner: ty, $mul_precision: ty) => {
+    ($what: ident, $inner: ty) => {
         impl core::ops::Add<$what> for $what {
             type Output = $what;
             fn add(self, rhs: $what) -> Self::Output {
@@ -199,25 +203,26 @@ macro_rules! assign_spring_compat_traits_gdmatrix {
                 self.0 = lhs;
             }
         }
-        impl core::ops::MulAssign<f64> for $what {
-            fn mul_assign(&mut self, rhs: f64) {
-                let mut lhs = self.0;
-                lhs = lhs * (rhs as $mul_precision);
-                self.0 = lhs;
-            }
-        }
-        impl core::ops::Mul<f64> for $what {
-            type Output = $what;
-            fn mul(self, rhs: f64) -> Self::Output {
-                Self(self.0 * rhs as $mul_precision)
-            }
-        }
-        impl<'a> core::ops::Mul<f64> for &'a $what {
-            type Output = $what;
-            fn mul(self, rhs: f64) -> Self::Output {
-                $what(self.0 * rhs as $mul_precision)
-            }
-        }
+        // DON'T DO THIS! This will naively multiply the stupid data structures!
+        // impl core::ops::MulAssign<f64> for $what {
+        //     fn mul_assign(&mut self, rhs: f64) {
+        //         let mut lhs = self.0;
+        //         lhs = lhs * (rhs as $mul_precision);
+        //         self.0 = lhs;
+        //     }
+        // }
+        // impl core::ops::Mul<f64> for $what {
+        //     type Output = $what;
+        //     fn mul(self, rhs: f64) -> Self::Output {
+        //         Self(self.0 * rhs as $mul_precision)
+        //     }
+        // }
+        // impl<'a> core::ops::Mul<f64> for &'a $what {
+        //     type Output = $what;
+        //     fn mul(self, rhs: f64) -> Self::Output {
+        //         $what(self.0 * rhs as $mul_precision)
+        //     }
+        // }
         impl Default for $what where $inner: Default {
             fn default() -> Self {
                 Self(<$inner>::default())

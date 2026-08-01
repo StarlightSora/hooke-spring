@@ -50,21 +50,100 @@ assign_spring_compat_traits_all!(HSVector3, Vector3, f32);
 pub struct HSVector4(pub Vector4);
 assign_spring_compat_traits_all!(HSVector4, Vector4, f32);
 
+// Yes, these are kind of DRY violations but there's no pragmatically better way as-is I think.
+// This sucks.
+
 #[derive(Debug)]
 pub struct HSTransform2D(pub Transform2D);
-assign_spring_compat_traits_gdmatrix!(HSTransform2D, Transform2D, f32);
+assign_spring_compat_traits_gdmatrix!(HSTransform2D, Transform2D);
+impl Mul<f64> for HSTransform2D {
+    type Output = HSTransform2D;
+    fn mul(self, rhs: f64) -> Self::Output {
+        HSTransform2D(Transform2D::IDENTITY.interpolate_with(&self.0, rhs as f32))
+    }
+}
+impl MulAssign<f64> for HSTransform2D {
+    fn mul_assign(&mut self, rhs: f64) {
+        let mut lhs = self.0;
+        lhs = lhs * (rhs as f32);
+        self.0 = lhs;
+    }
+}
+impl<'a> Mul<f64> for &'a HSTransform2D {
+    type Output = HSTransform2D;
+    fn mul(self, rhs: f64) -> Self::Output {
+        HSTransform2D(Transform2D::IDENTITY.interpolate_with(&self.0, rhs as f32))
+    }
+}
 
 #[derive(Debug)]
 pub struct HSTransform3D(pub Transform3D);
-assign_spring_compat_traits_gdmatrix!(HSTransform3D, Transform3D, f32);
+assign_spring_compat_traits_gdmatrix!(HSTransform3D, Transform3D);
+impl Mul<f64> for HSTransform3D {
+    type Output = HSTransform3D;
+    fn mul(self, rhs: f64) -> Self::Output {
+        HSTransform3D(Transform3D::IDENTITY.interpolate_with(&self.0, rhs as f32))
+    }
+}
+impl MulAssign<f64> for HSTransform3D {
+    fn mul_assign(&mut self, rhs: f64) {
+        let mut lhs = self.0;
+        lhs = lhs * (rhs as f32);
+        self.0 = lhs;
+    }
+}
+impl<'a> Mul<f64> for &'a HSTransform3D {
+    type Output = HSTransform3D;
+    fn mul(self, rhs: f64) -> Self::Output {
+        HSTransform3D(Transform3D::IDENTITY.interpolate_with(&self.0, rhs as f32))
+    }
+}
 
 #[derive(Debug)]
 pub struct HSBasis(pub Basis);
-assign_spring_compat_traits_gdmatrix!(HSBasis, Basis, f32);
+assign_spring_compat_traits_gdmatrix!(HSBasis, Basis);
+impl Mul<f64> for HSBasis {
+    type Output = HSBasis;
+    fn mul(self, rhs: f64) -> Self::Output {
+        HSBasis(Basis::IDENTITY.slerp(&self.0, rhs as f32))
+    }
+}
+impl MulAssign<f64> for HSBasis {
+    fn mul_assign(&mut self, rhs: f64) {
+        let mut lhs = self.0;
+        lhs = lhs * (rhs as f32);
+        self.0 = lhs;
+    }
+}
+impl<'a> Mul<f64> for &'a HSBasis {
+    type Output = HSBasis;
+    fn mul(self, rhs: f64) -> Self::Output {
+        HSBasis(Basis::IDENTITY.slerp(&self.0, rhs as f32))
+    }
+}
 
 #[derive(Debug)]
 pub struct HSQuaternion(pub Quaternion);
-assign_spring_compat_traits_gdmatrix!(HSQuaternion, Quaternion, f32);
+assign_spring_compat_traits_gdmatrix!(HSQuaternion, Quaternion);
+impl Mul<f64> for HSQuaternion {
+    type Output = HSQuaternion;
+    fn mul(self, rhs: f64) -> Self::Output {
+        HSQuaternion(Quaternion::IDENTITY.slerp(self.0, rhs as f32)) // Why borrow for Quaternion but owned for everything else? WTH??
+    }
+}
+impl MulAssign<f64> for HSQuaternion {
+    fn mul_assign(&mut self, rhs: f64) {
+        let mut lhs = self.0;
+        lhs = lhs * (rhs as f32);
+        self.0 = lhs;
+    }
+}
+impl<'a> Mul<f64> for &'a HSQuaternion {
+    type Output = HSQuaternion;
+    fn mul(self, rhs: f64) -> Self::Output {
+        HSQuaternion(Quaternion::IDENTITY.slerp(self.0, rhs as f32))
+    }
+}
 
 
 #[derive(Debug)]
@@ -176,6 +255,34 @@ impl RSHookeSpring {
     pub fn new_vector4(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
         Gd::from_init_fn(|base| Self {
             spring: RSHookeSpringVariant::Vector4(make_new_spring::<HSVector4>(Some(damper), Some(speed), clock)),
+            base,
+        })
+    }
+    #[func]
+    pub fn new_transform2d(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
+        Gd::from_init_fn(|base| Self {
+            spring: RSHookeSpringVariant::Transform2D(make_new_spring::<HSTransform2D>(Some(damper), Some(speed), clock)),
+            base,
+        })
+    }
+    #[func]
+    pub fn new_transform3d(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
+        Gd::from_init_fn(|base| Self {
+            spring: RSHookeSpringVariant::Transform3D(make_new_spring::<HSTransform3D>(Some(damper), Some(speed), clock)),
+            base,
+        })
+    }
+    #[func]
+    pub fn new_basis(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
+        Gd::from_init_fn(|base| Self {
+            spring: RSHookeSpringVariant::Basis(make_new_spring::<HSBasis>(Some(damper), Some(speed), clock)),
+            base,
+        })
+    }
+    #[func]
+    pub fn new_quaternion(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
+        Gd::from_init_fn(|base| Self {
+            spring: RSHookeSpringVariant::Quaternion(make_new_spring::<HSQuaternion>(Some(damper), Some(speed), clock)),
             base,
         })
     }
