@@ -4,5 +4,5 @@ pub struct GDHookeSpringExtension;
 unsafe impl ExtensionLibrary for GDHookeSpringExtension {}
 
 pub mod rs_hooke_spring;
-pub mod gdrs_stopwatch;
+pub mod rs_stopwatch;
 mod macros;

@@ -13,21 +13,21 @@ use super::super::clocks::units::ElapsedTimeSecs;
 
 // pull black magic spells (macro_rules!) into scope
 use super::macros::*;
-use super::super::macros::assign_spring_compat_traits;
+use super::super::macros::*;
 
-use super::gdrs_stopwatch::*;
+use super::rs_stopwatch::*;
 
 use core::fmt::Debug;
 use core::ops::{Add, AddAssign, Mul, MulAssign};
-fn make_new_spring<T>(damper: Option<HookeSpringDamper>, speed: Option<HookeSpringSpeed>, clock: Option<Gd<GDRSStopwatch>>) -> HookeSpring<T>
+fn make_new_spring<T>(damper: Option<HookeSpringDamper>, speed: Option<HookeSpringSpeed>, clock: Option<Gd<RSStopwatch>>) -> HookeSpring<T>
 where T: Default + Copy + AddAssign + Add<T, Output = T> + Mul<f64, Output = T> + MulAssign<f64>,
 for<'a> &'a T: Mul<f64, Output = T> {
-    let clock_to_inject: InnerGDRSStopwatch = match clock {
+    let clock_to_inject: InnerRSStopwatch = match clock {
         Some(gd_instance) => {
             gd_instance.bind().inner_clone()
         }
         None => {
-            InnerGDRSStopwatch::new()
+            InnerRSStopwatch::new()
         }
     };
     let boxed_clock: Box<dyn HookeSpringClock> = Box::new(clock_to_inject);
@@ -36,19 +36,36 @@ for<'a> &'a T: Mul<f64, Output = T> {
 
 #[derive(Debug)]
 pub struct HSFloat(pub f64);
-assign_spring_compat_traits!(HSFloat, f64, f64);
+assign_spring_compat_traits_all!(HSFloat, f64, f64);
 
 #[derive(Debug)]
 pub struct HSVector2(pub Vector2);
-assign_spring_compat_traits!(HSVector2, Vector2, f32);
+assign_spring_compat_traits_all!(HSVector2, Vector2, f32);
 
 #[derive(Debug)]
 pub struct HSVector3(pub Vector3);
-assign_spring_compat_traits!(HSVector3, Vector3, f32);
+assign_spring_compat_traits_all!(HSVector3, Vector3, f32);
 
 #[derive(Debug)]
 pub struct HSVector4(pub Vector4);
-assign_spring_compat_traits!(HSVector4, Vector4, f32);
+assign_spring_compat_traits_all!(HSVector4, Vector4, f32);
+
+#[derive(Debug)]
+pub struct HSTransform2D(pub Transform2D);
+assign_spring_compat_traits_gdmatrix!(HSTransform2D, Transform2D, f32);
+
+#[derive(Debug)]
+pub struct HSTransform3D(pub Transform3D);
+assign_spring_compat_traits_gdmatrix!(HSTransform3D, Transform3D, f32);
+
+#[derive(Debug)]
+pub struct HSBasis(pub Basis);
+assign_spring_compat_traits_gdmatrix!(HSBasis, Basis, f32);
+
+#[derive(Debug)]
+pub struct HSQuaternion(pub Quaternion);
+assign_spring_compat_traits_gdmatrix!(HSQuaternion, Quaternion, f32);
+
 
 #[derive(Debug)]
 pub enum HSCompatibleTypes {
@@ -56,6 +73,10 @@ pub enum HSCompatibleTypes {
     Vector2(HSVector2),
     Vector3(HSVector3),
     Vector4(HSVector4),
+    Transform2D(HSTransform2D),
+    Transform3D(HSTransform3D),
+    Basis(HSBasis),
+    Quaternion(HSQuaternion),
 }
 impl GodotConvert for HSCompatibleTypes {
     type Via = Variant;
@@ -73,6 +94,14 @@ impl FromGodot for HSCompatibleTypes {
             Ok(HSCompatibleTypes::Vector3(HSVector3(v3)))
         } else if let Ok(v4) = via.try_to::<Vector4>() {
             Ok(HSCompatibleTypes::Vector4(HSVector4(v4)))
+        } else if let Ok(t2) = via.try_to::<Transform2D>() {
+            Ok(HSCompatibleTypes::Transform2D(HSTransform2D(t2)))
+        } else if let Ok(t3) = via.try_to::<Transform3D>() {
+            Ok(HSCompatibleTypes::Transform3D(HSTransform3D(t3)))
+        } else if let Ok(bs) = via.try_to::<Basis>() {
+            Ok(HSCompatibleTypes::Basis(HSBasis(bs)))
+        } else if let Ok(qt) = via.try_to::<Quaternion>() {
+            Ok(HSCompatibleTypes::Quaternion(HSQuaternion(qt)))
         } else {
             Err(ConvertError::with_error("Conversion failed!"))
         }
@@ -86,6 +115,10 @@ impl ToGodot for HSCompatibleTypes {
             HSCompatibleTypes::Vector2(val) => val.0.to_variant(),
             HSCompatibleTypes::Vector3(val) => val.0.to_variant(),
             HSCompatibleTypes::Vector4(val) => val.0.to_variant(),
+            HSCompatibleTypes::Transform2D(val) => val.0.to_variant(),
+            HSCompatibleTypes::Transform3D(val) => val.0.to_variant(),
+            HSCompatibleTypes::Basis(val) => val.0.to_variant(),
+            HSCompatibleTypes::Quaternion(val) => val.0.to_variant(),
         }
     }
 }
@@ -97,6 +130,10 @@ pub enum RSHookeSpringVariant {
     Vector2(HookeSpring<HSVector2>),
     Vector3(HookeSpring<HSVector3>),
     Vector4(HookeSpring<HSVector4>),
+    Transform2D(HookeSpring<HSTransform2D>),
+    Transform3D(HookeSpring<HSTransform3D>),
+    Basis(HookeSpring<HSBasis>),
+    Quaternion(HookeSpring<HSQuaternion>),
 }
 impl Default for RSHookeSpringVariant {
     fn default() -> Self {
@@ -115,28 +152,28 @@ pub struct RSHookeSpring {
 impl RSHookeSpring {
     // Constructors //
     #[func]
-    pub fn new_float(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<GDRSStopwatch>>) -> Gd<Self> {
+    pub fn new_float(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
         Gd::from_init_fn(|base| Self {
             spring: RSHookeSpringVariant::Float(make_new_spring::<HSFloat>(Some(damper), Some(speed), clock)),
             base,
         })
     }
     #[func]
-    pub fn new_vector2(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<GDRSStopwatch>>) -> Gd<Self> {
+    pub fn new_vector2(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
         Gd::from_init_fn(|base| Self {
             spring: RSHookeSpringVariant::Vector2(make_new_spring::<HSVector2>(Some(damper), Some(speed), clock)),
             base,
         })
     }
     #[func]
-    pub fn new_vector3(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<GDRSStopwatch>>) -> Gd<Self> {
+    pub fn new_vector3(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
         Gd::from_init_fn(|base| Self {
             spring: RSHookeSpringVariant::Vector3(make_new_spring::<HSVector3>(Some(damper), Some(speed), clock)),
             base,
         })
     }
     #[func]
-    pub fn new_vector4(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<GDRSStopwatch>>) -> Gd<Self> {
+    pub fn new_vector4(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
         Gd::from_init_fn(|base| Self {
             spring: RSHookeSpringVariant::Vector4(make_new_spring::<HSVector4>(Some(damper), Some(speed), clock)),
             base,
@@ -214,13 +251,13 @@ impl RSHookeSpring {
         hs_variant_match_untyped!(&mut self.spring, HookeSpring::elapsed_time)
     }
     #[func]
-    pub fn get_clock_copy(&self) -> Gd<GDRSStopwatch> {
+    pub fn get_clock_copy(&self) -> Gd<RSStopwatch> {
         let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
-        if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
-            GDRSStopwatch::from_inner(inner)
+        if let Some(inner) = clock.as_any().downcast_ref::<InnerRSStopwatch>() {
+            RSStopwatch::from_inner(inner)
         } else {
-            godot_error!("Expected InnerGDRSStopwatch, got something else");
-            GDRSStopwatch::new_running()
+            godot_error!("Expected InnerRSStopwatch, got something else");
+            RSStopwatch::new_running()
         }
     } 
 
@@ -231,48 +268,48 @@ impl RSHookeSpring {
     #[func]
     pub fn time_dilate(&mut self, multiplier: f64) {
         let clock_mut = hs_variant_match_untyped!(&mut self.spring, HookeSpring::clock_mut);
-        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerGDRSStopwatch>() {
+        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerRSStopwatch>() {
             inner.time_dilate(multiplier);
         } else {
-            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            godot_error!("Expected InnerRSStopwatch, got something else");
         }
     }
     #[func]
     pub fn time_skip_raw(&mut self, by: ElapsedTimeSecs) {
         let clock_mut = hs_variant_match_untyped!(&mut self.spring, HookeSpring::clock_mut);
-        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerGDRSStopwatch>() {
+        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerRSStopwatch>() {
             inner.time_skip_raw(by);
         } else {
-            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            godot_error!("Expected InnerRSStopwatch, got something else");
         }
     }
     #[func]
     pub fn get_time_scale(&self) -> f64 {
         let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
-        if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
+        if let Some(inner) = clock.as_any().downcast_ref::<InnerRSStopwatch>() {
             *inner.time_scale()
         } else {
-            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            godot_error!("Expected InnerRSStopwatch, got something else");
             1.0f64
         }
     }
     #[func]
     pub fn get_engine_elapsed_time(&self) -> ElapsedTimeSecs {
         let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
-        if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
+        if let Some(inner) = clock.as_any().downcast_ref::<InnerRSStopwatch>() {
             inner.real_elapsed()
         } else {
-            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            godot_error!("Expected InnerRSStopwatch, got something else");
             0.0f64
         }
     }
     #[func]
     pub fn get_created_time(&self) -> ElapsedTimeSecs {
         let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
-        if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
+        if let Some(inner) = clock.as_any().downcast_ref::<InnerRSStopwatch>() {
             inner.created_time()
         } else {
-            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            godot_error!("Expected InnerRSStopwatch, got something else");
             0.0f64
         }
     }
@@ -280,29 +317,29 @@ impl RSHookeSpring {
     #[func]
     pub fn is_paused(&self) -> bool {
         let clock = hs_variant_match_untyped!(&self.spring, HookeSpring::clock);
-        if let Some(inner) = clock.as_any().downcast_ref::<InnerGDRSStopwatch>() {
+        if let Some(inner) = clock.as_any().downcast_ref::<InnerRSStopwatch>() {
             inner.is_paused()
         } else {
-            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            godot_error!("Expected InnerRSStopwatch, got something else");
             false
         }
     }
     #[func]
     pub fn pause(&mut self) {
         let clock_mut = hs_variant_match_untyped!(&mut self.spring, HookeSpring::clock_mut);
-        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerGDRSStopwatch>() {
+        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerRSStopwatch>() {
             inner.pause();
         } else {
-            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            godot_error!("Expected InnerRSStopwatch, got something else");
         }
     }
     #[func]
     pub fn resume(&mut self) {
         let clock_mut = hs_variant_match_untyped!(&mut self.spring, HookeSpring::clock_mut);
-        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerGDRSStopwatch>() {
+        if let Some(inner) = clock_mut.as_any_mut().downcast_mut::<InnerRSStopwatch>() {
             inner.resume();
         } else {
-            godot_error!("Expected InnerGDRSStopwatch, got something else");
+            godot_error!("Expected InnerRSStopwatch, got something else");
         }
     }
 }

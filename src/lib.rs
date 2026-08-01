@@ -11,6 +11,7 @@ pub use hooke_spring::HookeSpring;
 pub mod hooke_spring;
 pub mod clocks;
 pub mod macros; // Needs to be pub to suppress unused import warning
+pub mod prelude;
 
 #[cfg(feature = "godot_bind")]
 pub mod godot_support;

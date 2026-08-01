@@ -9,14 +9,14 @@ const fn usec_to_ets(usec: u64) -> ElapsedTimeSecs {
 }
 
 #[derive(Debug, Clone)]
-pub struct InnerGDRSStopwatch {
+pub struct InnerRSStopwatch {
     created: ElapsedTimeSecs,
     last_evaluated_real: ElapsedTimeSecs,
     last_effective_time: ElapsedTimeSecs,
     time_scale: f64,
     paused: bool,
 }
-impl HookeSpringClock for InnerGDRSStopwatch {
+impl HookeSpringClock for InnerRSStopwatch {
     fn evaluate_elapsed(&mut self) -> ElapsedTimeSecs {
         if self.paused {
             self.last_effective_time
@@ -36,12 +36,12 @@ impl HookeSpringClock for InnerGDRSStopwatch {
         self.last_effective_time += by * self.time_scale;
     }
 }
-impl Default for InnerGDRSStopwatch {
+impl Default for InnerRSStopwatch {
     fn default() -> Self {
         Self::new()
     }
 }
-impl InnerGDRSStopwatch {
+impl InnerRSStopwatch {
     pub fn new() -> Self {
         Self {
             created: usec_to_ets(Time::singleton().get_ticks_usec()),
@@ -109,18 +109,18 @@ impl InnerGDRSStopwatch {
 
 #[derive(GodotClass)]
 #[class(base=Resource, no_init)]
-pub struct GDRSStopwatch {
-    pub inner: InnerGDRSStopwatch,
+pub struct RSStopwatch {
+    pub inner: InnerRSStopwatch,
     pub base: Base<Resource>,
 }
 
 #[godot_api]
-impl GDRSStopwatch {
+impl RSStopwatch {
     #[func]
     pub fn new_running() -> Gd<Self> {
         Gd::from_init_fn(|base| {
             Self {
-                inner: InnerGDRSStopwatch::new(),
+                inner: InnerRSStopwatch::new(),
                 base,
             }
         })
@@ -129,13 +129,13 @@ impl GDRSStopwatch {
     pub fn new_manual() -> Gd<Self> {
         Gd::from_init_fn(|base| {
             Self {
-                inner: InnerGDRSStopwatch::new_stopped(),
+                inner: InnerRSStopwatch::new_stopped(),
                 base,
             }
         })
     }
 
-    pub fn from_inner(inner: &InnerGDRSStopwatch) -> Gd<Self> {
+    pub fn from_inner(inner: &InnerRSStopwatch) -> Gd<Self> {
         Gd::from_init_fn(|base| {
             Self {
                 inner: inner.clone(),
@@ -193,10 +193,10 @@ impl GDRSStopwatch {
         self.inner.reset()
     }
 
-    pub fn inner_clone(&self) -> InnerGDRSStopwatch {
+    pub fn inner_clone(&self) -> InnerRSStopwatch {
         self.inner.clone()
     }
 }
 
 #[godot_api]
-impl IResource for GDRSStopwatch {}
+impl IResource for RSStopwatch {}
