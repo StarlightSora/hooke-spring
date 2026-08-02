@@ -1,3 +1,4 @@
+//! Re-exports necessary types and traits to use this library.
 pub use super::clocks::manual_clock::ManualClock;
 #[cfg(feature = "smol_stopwatch")]
 pub use super::clocks::smol_stopwatch::SmolStopwatch;

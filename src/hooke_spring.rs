@@ -184,10 +184,10 @@ for<'a> &'a T: Mul<f64, Output = T> {
     }
     /// Modifies the `target`.
     /// 
-    /// If `do_not_animate` is `Some(true)`, the position and target are set immediately
-    /// and velocity is reset to zero. This only causes the instance to re-evaluate the elapsed time.
+    /// If `do_not_animate` is `Some(true)`, the `position` and `target` are set immediately
+    /// and `velocity` is reset to zero. This only causes the instance to re-evaluate the elapsed time.
     /// 
-    /// Otherwise, the instance fully re-evaluates itself, then the target is updated.
+    /// Otherwise, the instance fully re-evaluates itself, then the `target` is updated.
     /// 
     /// # Examples
     ///

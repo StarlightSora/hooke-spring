@@ -1,4 +1,4 @@
-//! Contains macros to reduce boilerplate
+//! Contains macros to reduce boilerplate.
 
 /// Implement necessary traits to newtypes; when multiplying $inner with f64, cast to $mul_precision for compatibility (typically f64 or f32)
 /// 
