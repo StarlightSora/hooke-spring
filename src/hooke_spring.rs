@@ -3,7 +3,7 @@ extern crate alloc;
 use alloc::boxed::Box;
 use core::ops::{Add, AddAssign, Mul, MulAssign};
 use core::any::Any;
-use crate::ManualClock;
+use super::clocks::manual_clock::ManualClock;
 
 #[cfg(feature = "libm")]
 use libm::{sqrt, exp, cos, sin};
@@ -110,7 +110,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// # Examples
     ///
     /// ```
-    /// use hooke_spring::HookeSpring;
+    /// use hooke_spring::prelude::*;
     ///
     /// // Create a spring with default values
     /// let mut spring = HookeSpring::<f64>::new(None, None, None, None, None, None);
@@ -148,7 +148,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// # Examples
     ///
     /// ```
-    /// use hooke_spring::HookeSpring;
+    /// use hooke_spring::prelude::*;
     ///
     /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, None);
     /// spring.impulse(5.0);
@@ -172,7 +172,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// # Examples
     ///
     /// ```
-    /// use hooke_spring::HookeSpring;
+    /// use hooke_spring::prelude::*;
     ///
     /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, None);
     /// spring.time_skip(4.0);
@@ -192,7 +192,7 @@ for<'a> &'a T: Mul<f64, Output = T> {
     /// # Examples
     ///
     /// ```
-    /// use hooke_spring::HookeSpring;
+    /// use hooke_spring::prelude::*;
     ///
     /// let mut spring = HookeSpring::from_damper_speed(0.75, 2.0, None);
     /// // Set the target without animating

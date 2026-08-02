@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod hooke_spring_tests {
-    use std::{f64::consts::PI};
-    use hooke_spring::{ManualClock, hooke_spring::*};
+    use std::f64::consts::PI;
+    use hooke_spring::prelude::*;
 
     #[test]
     fn constructors() {
