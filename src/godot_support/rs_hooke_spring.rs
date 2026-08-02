@@ -50,100 +50,105 @@ assign_spring_compat_traits_all!(HSVector3, Vector3, f32);
 pub struct HSVector4(pub Vector4);
 assign_spring_compat_traits_all!(HSVector4, Vector4, f32);
 
-// Yes, these are kind of DRY violations but there's no pragmatically better way as-is I think.
-// This sucks.
+// NOTE: Support for matrix data types are dropped due to erratic behavior.
+// They probably need a dedicated HookeSpring variant if these were to be possible.
+// If you want to use this on Transform3Ds or Quaternions,
+// consider using Vector3 and constructing a quaternion whenever necessary
+// with Quaternion::from_euler instead.
 
-#[derive(Debug)]
-pub struct HSTransform2D(pub Transform2D);
-assign_spring_compat_traits_gdmatrix!(HSTransform2D, Transform2D);
-impl Mul<f64> for HSTransform2D {
-    type Output = HSTransform2D;
-    fn mul(self, rhs: f64) -> Self::Output {
-        HSTransform2D(Transform2D::IDENTITY.interpolate_with(&self.0, rhs as f32))
-    }
-}
-impl MulAssign<f64> for HSTransform2D {
-    fn mul_assign(&mut self, rhs: f64) {
-        let mut lhs = self.0;
-        lhs = lhs * (rhs as f32);
-        self.0 = lhs;
-    }
-}
-impl<'a> Mul<f64> for &'a HSTransform2D {
-    type Output = HSTransform2D;
-    fn mul(self, rhs: f64) -> Self::Output {
-        HSTransform2D(Transform2D::IDENTITY.interpolate_with(&self.0, rhs as f32))
-    }
-}
+//// Yes, these are kind of DRY violations but there's no pragmatically better way as-is I think.
+//// This sucks.
+// #[derive(Debug)]
+// pub struct HSTransform2D(pub Transform2D);
+// assign_spring_compat_traits_gdmatrix!(HSTransform2D, Transform2D);
+// impl Mul<f64> for HSTransform2D {
+//     type Output = HSTransform2D;
+//     fn mul(self, rhs: f64) -> Self::Output {
+//         HSTransform2D(Transform2D::IDENTITY.interpolate_with(&self.0, rhs as f32))
+//     }
+// }
+// impl MulAssign<f64> for HSTransform2D {
+//     fn mul_assign(&mut self, rhs: f64) {
+//         let mut lhs = self.0;
+//         lhs = lhs * (rhs as f32);
+//         self.0 = lhs;
+//     }
+// }
+// impl<'a> Mul<f64> for &'a HSTransform2D {
+//     type Output = HSTransform2D;
+//     fn mul(self, rhs: f64) -> Self::Output {
+//         HSTransform2D(Transform2D::IDENTITY.interpolate_with(&self.0, rhs as f32))
+//     }
+// }
 
-#[derive(Debug)]
-pub struct HSTransform3D(pub Transform3D);
-assign_spring_compat_traits_gdmatrix!(HSTransform3D, Transform3D);
-impl Mul<f64> for HSTransform3D {
-    type Output = HSTransform3D;
-    fn mul(self, rhs: f64) -> Self::Output {
-        HSTransform3D(Transform3D::IDENTITY.interpolate_with(&self.0, rhs as f32))
-    }
-}
-impl MulAssign<f64> for HSTransform3D {
-    fn mul_assign(&mut self, rhs: f64) {
-        let mut lhs = self.0;
-        lhs = lhs * (rhs as f32);
-        self.0 = lhs;
-    }
-}
-impl<'a> Mul<f64> for &'a HSTransform3D {
-    type Output = HSTransform3D;
-    fn mul(self, rhs: f64) -> Self::Output {
-        HSTransform3D(Transform3D::IDENTITY.interpolate_with(&self.0, rhs as f32))
-    }
-}
+// #[derive(Debug)]
+// pub struct HSTransform3D(pub Transform3D);
+// assign_spring_compat_traits_gdmatrix!(HSTransform3D, Transform3D);
+// impl Mul<f64> for HSTransform3D {
+//     type Output = HSTransform3D;
+//     fn mul(self, rhs: f64) -> Self::Output {
+//         HSTransform3D(Transform3D::IDENTITY.interpolate_with(&self.0, rhs as f32))
+//     }
+// }
+// impl MulAssign<f64> for HSTransform3D {
+//     fn mul_assign(&mut self, rhs: f64) {
+//         let mut lhs = self.0;
+//         lhs = lhs * (rhs as f32);
+//         self.0 = lhs;
+//     }
+// }
+// impl<'a> Mul<f64> for &'a HSTransform3D {
+//     type Output = HSTransform3D;
+//     fn mul(self, rhs: f64) -> Self::Output {
+//         HSTransform3D(Transform3D::IDENTITY.interpolate_with(&self.0, rhs as f32))
+//     }
+// }
 
-#[derive(Debug)]
-pub struct HSBasis(pub Basis);
-assign_spring_compat_traits_gdmatrix!(HSBasis, Basis);
-impl Mul<f64> for HSBasis {
-    type Output = HSBasis;
-    fn mul(self, rhs: f64) -> Self::Output {
-        HSBasis(Basis::IDENTITY.slerp(&self.0, rhs as f32))
-    }
-}
-impl MulAssign<f64> for HSBasis {
-    fn mul_assign(&mut self, rhs: f64) {
-        let mut lhs = self.0;
-        lhs = lhs * (rhs as f32);
-        self.0 = lhs;
-    }
-}
-impl<'a> Mul<f64> for &'a HSBasis {
-    type Output = HSBasis;
-    fn mul(self, rhs: f64) -> Self::Output {
-        HSBasis(Basis::IDENTITY.slerp(&self.0, rhs as f32))
-    }
-}
+// #[derive(Debug)]
+// pub struct HSBasis(pub Basis);
+// assign_spring_compat_traits_gdmatrix!(HSBasis, Basis);
+// impl Mul<f64> for HSBasis {
+//     type Output = HSBasis;
+//     fn mul(self, rhs: f64) -> Self::Output {
+//         HSBasis(Basis::IDENTITY.slerp(&self.0, rhs as f32))
+//     }
+// }
+// impl MulAssign<f64> for HSBasis {
+//     fn mul_assign(&mut self, rhs: f64) {
+//         let mut lhs = self.0;
+//         lhs = lhs * (rhs as f32);
+//         self.0 = lhs;
+//     }
+// }
+// impl<'a> Mul<f64> for &'a HSBasis {
+//     type Output = HSBasis;
+//     fn mul(self, rhs: f64) -> Self::Output {
+//         HSBasis(Basis::IDENTITY.slerp(&self.0, rhs as f32))
+//     }
+// }
 
-#[derive(Debug)]
-pub struct HSQuaternion(pub Quaternion);
-assign_spring_compat_traits_gdmatrix!(HSQuaternion, Quaternion);
-impl Mul<f64> for HSQuaternion {
-    type Output = HSQuaternion;
-    fn mul(self, rhs: f64) -> Self::Output {
-        HSQuaternion(Quaternion::IDENTITY.slerp(self.0.normalized(), rhs as f32))
-    }
-}
-impl MulAssign<f64> for HSQuaternion {
-    fn mul_assign(&mut self, rhs: f64) {
-        let mut lhs = self.0;
-        lhs = lhs * (rhs as f32);
-        self.0 = lhs;
-    }
-}
-impl<'a> Mul<f64> for &'a HSQuaternion {
-    type Output = HSQuaternion;
-    fn mul(self, rhs: f64) -> Self::Output {
-        HSQuaternion(Quaternion::IDENTITY.slerp(self.0.normalized(), rhs as f32))
-    }
-}
+// #[derive(Debug)]
+// pub struct HSQuaternion(pub Quaternion);
+// assign_spring_compat_traits_gdmatrix!(HSQuaternion, Quaternion);
+// impl Mul<f64> for HSQuaternion {
+//     type Output = HSQuaternion;
+//     fn mul(self, rhs: f64) -> Self::Output {
+//         HSQuaternion(Quaternion::IDENTITY.slerp(self.0.normalized(), rhs as f32))
+//     }
+// }
+// impl MulAssign<f64> for HSQuaternion {
+//     fn mul_assign(&mut self, rhs: f64) {
+//         let mut lhs = self.0;
+//         lhs = lhs * (rhs as f32);
+//         self.0 = lhs;
+//     }
+// }
+// impl<'a> Mul<f64> for &'a HSQuaternion {
+//     type Output = HSQuaternion;
+//     fn mul(self, rhs: f64) -> Self::Output {
+//         HSQuaternion(Quaternion::IDENTITY.slerp(self.0.normalized(), rhs as f32))
+//     }
+// }
 
 
 #[derive(Debug)]
@@ -152,10 +157,10 @@ pub enum HSCompatibleTypes {
     Vector2(HSVector2),
     Vector3(HSVector3),
     Vector4(HSVector4),
-    Transform2D(HSTransform2D),
-    Transform3D(HSTransform3D),
-    Basis(HSBasis),
-    Quaternion(HSQuaternion),
+    // Transform2D(HSTransform2D),
+    // Transform3D(HSTransform3D),
+    // Basis(HSBasis),
+    // Quaternion(HSQuaternion),
 }
 impl GodotConvert for HSCompatibleTypes {
     type Via = Variant;
@@ -173,14 +178,14 @@ impl FromGodot for HSCompatibleTypes {
             Ok(HSCompatibleTypes::Vector3(HSVector3(v3)))
         } else if let Ok(v4) = via.try_to::<Vector4>() {
             Ok(HSCompatibleTypes::Vector4(HSVector4(v4)))
-        } else if let Ok(t2) = via.try_to::<Transform2D>() {
-            Ok(HSCompatibleTypes::Transform2D(HSTransform2D(t2)))
-        } else if let Ok(t3) = via.try_to::<Transform3D>() {
-            Ok(HSCompatibleTypes::Transform3D(HSTransform3D(t3)))
-        } else if let Ok(bs) = via.try_to::<Basis>() {
-            Ok(HSCompatibleTypes::Basis(HSBasis(bs)))
-        } else if let Ok(qt) = via.try_to::<Quaternion>() {
-            Ok(HSCompatibleTypes::Quaternion(HSQuaternion(qt)))
+        // } else if let Ok(t2) = via.try_to::<Transform2D>() {
+        //     Ok(HSCompatibleTypes::Transform2D(HSTransform2D(t2)))
+        // } else if let Ok(t3) = via.try_to::<Transform3D>() {
+        //     Ok(HSCompatibleTypes::Transform3D(HSTransform3D(t3)))
+        // } else if let Ok(bs) = via.try_to::<Basis>() {
+        //     Ok(HSCompatibleTypes::Basis(HSBasis(bs)))
+        // } else if let Ok(qt) = via.try_to::<Quaternion>() {
+        //     Ok(HSCompatibleTypes::Quaternion(HSQuaternion(qt)))
         } else {
             Err(ConvertError::with_error("Conversion failed!"))
         }
@@ -194,10 +199,10 @@ impl ToGodot for HSCompatibleTypes {
             HSCompatibleTypes::Vector2(val) => val.0.to_variant(),
             HSCompatibleTypes::Vector3(val) => val.0.to_variant(),
             HSCompatibleTypes::Vector4(val) => val.0.to_variant(),
-            HSCompatibleTypes::Transform2D(val) => val.0.to_variant(),
-            HSCompatibleTypes::Transform3D(val) => val.0.to_variant(),
-            HSCompatibleTypes::Basis(val) => val.0.to_variant(),
-            HSCompatibleTypes::Quaternion(val) => val.0.to_variant(),
+            // HSCompatibleTypes::Transform2D(val) => val.0.to_variant(),
+            // HSCompatibleTypes::Transform3D(val) => val.0.to_variant(),
+            // HSCompatibleTypes::Basis(val) => val.0.to_variant(),
+            // HSCompatibleTypes::Quaternion(val) => val.0.to_variant(),
         }
     }
 }
@@ -209,10 +214,10 @@ pub enum RSHookeSpringVariant {
     Vector2(HookeSpring<HSVector2>),
     Vector3(HookeSpring<HSVector3>),
     Vector4(HookeSpring<HSVector4>),
-    Transform2D(HookeSpring<HSTransform2D>),
-    Transform3D(HookeSpring<HSTransform3D>),
-    Basis(HookeSpring<HSBasis>),
-    Quaternion(HookeSpring<HSQuaternion>),
+    // Transform2D(HookeSpring<HSTransform2D>),
+    // Transform3D(HookeSpring<HSTransform3D>),
+    // Basis(HookeSpring<HSBasis>),
+    // Quaternion(HookeSpring<HSQuaternion>),
 }
 impl Default for RSHookeSpringVariant {
     fn default() -> Self {
@@ -258,34 +263,34 @@ impl RSHookeSpring {
             base,
         })
     }
-    #[func]
-    pub fn new_transform2d(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
-        Gd::from_init_fn(|base| Self {
-            spring: RSHookeSpringVariant::Transform2D(make_new_spring::<HSTransform2D>(Some(damper), Some(speed), clock)),
-            base,
-        })
-    }
-    #[func]
-    pub fn new_transform3d(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
-        Gd::from_init_fn(|base| Self {
-            spring: RSHookeSpringVariant::Transform3D(make_new_spring::<HSTransform3D>(Some(damper), Some(speed), clock)),
-            base,
-        })
-    }
-    #[func]
-    pub fn new_basis(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
-        Gd::from_init_fn(|base| Self {
-            spring: RSHookeSpringVariant::Basis(make_new_spring::<HSBasis>(Some(damper), Some(speed), clock)),
-            base,
-        })
-    }
-    #[func]
-    pub fn new_quaternion(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
-        Gd::from_init_fn(|base| Self {
-            spring: RSHookeSpringVariant::Quaternion(make_new_spring::<HSQuaternion>(Some(damper), Some(speed), clock)),
-            base,
-        })
-    }
+    // #[func]
+    // pub fn new_transform2d(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
+    //     Gd::from_init_fn(|base| Self {
+    //         spring: RSHookeSpringVariant::Transform2D(make_new_spring::<HSTransform2D>(Some(damper), Some(speed), clock)),
+    //         base,
+    //     })
+    // }
+    // #[func]
+    // pub fn new_transform3d(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
+    //     Gd::from_init_fn(|base| Self {
+    //         spring: RSHookeSpringVariant::Transform3D(make_new_spring::<HSTransform3D>(Some(damper), Some(speed), clock)),
+    //         base,
+    //     })
+    // }
+    // #[func]
+    // pub fn new_basis(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
+    //     Gd::from_init_fn(|base| Self {
+    //         spring: RSHookeSpringVariant::Basis(make_new_spring::<HSBasis>(Some(damper), Some(speed), clock)),
+    //         base,
+    //     })
+    // }
+    // #[func]
+    // pub fn new_quaternion(damper: HookeSpringDamper, speed: HookeSpringSpeed, clock: Option<Gd<RSStopwatch>>) -> Gd<Self> {
+    //     Gd::from_init_fn(|base| Self {
+    //         spring: RSHookeSpringVariant::Quaternion(make_new_spring::<HSQuaternion>(Some(damper), Some(speed), clock)),
+    //         base,
+    //     })
+    // }
     // Setters //
     // See ../macros.rs for more information on what the heck these macros do... //
     #[func]
