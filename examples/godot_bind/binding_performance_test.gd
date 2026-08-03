@@ -1,28 +1,34 @@
 extends Node2D # You should attach this script to a Node2D.
 
 # How many springs to simulate.
-const SPRINGS_TO_SIMULATE: int = 100 # In this example we will simulate 100 springs at once.
+# In this example we will simulate 100 springs at once.
+# Note that this is an extreme example to demonstrate the performance of the library.
+# In a real project you'd be evaluating much less springs every frame.
+const SPRINGS_TO_SIMULATE: int = 100
 # The FPS of the simulation.
-const SIMULATION_FPS: float = 240.0 # In this example our target FPS is 240.
+# In this example our target FPS is 240.
+const SIMULATION_FPS: float = 240.0
 # How many frames to simulate.
-const SIMULATION_STEPS: int = floori(10.0*SIMULATION_FPS) # We will simulate 10 seconds worth of frames. 2400 in this case.
-
+# We will simulate 10 seconds worth of frames, which is 2400 frames in this case.
+const SIMULATION_STEPS: int = floori(10.0*SIMULATION_FPS)
+# We convert FPS to time between each frame in compile time. Don't touch this.
 const SIMULATION_DT: float = 1.0/SIMULATION_FPS
+
 func _ready() -> void:
+	# Make SPRINGS_TO_SIMULATE amount of Vector3-based RSHookeSprings.
 	var springs: Array[RSHookeSpring] = []
 	springs.resize(SPRINGS_TO_SIMULATE)
 	for i in range(SPRINGS_TO_SIMULATE):
-		# Make SPRINGS_TO_SIMULATE amount of Vector3-based RSHookeSprings.
 		springs[i] = RSHookeSpring.new_vector3(0.5, PI, RSStopwatch.new_manual())
 	
 	# Let the engine breathe before running the test.
-    # This ensures that our metrics don't get skewed from engine initialization overhead.
+	# This ensures that our metrics don't get skewed from engine initialization overhead.
 	await get_tree().create_timer(2.0).timeout
 	
 	var start: int = Time.get_ticks_usec()
 	for frame in range(SIMULATION_STEPS):
 		for i in range(SPRINGS_TO_SIMULATE):
-			var spring = springs[i] # Grab a mutable reference.
+			var spring = springs[i] # Grab a mutable reference to a spring in the array of springs.
 			# Force the spring to update itself and intentionally discard the return value.
 			var _p = spring.get_position()
 			# Advance the time in the spring.
