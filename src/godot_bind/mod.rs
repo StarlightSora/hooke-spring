@@ -1,4 +1,6 @@
-//! Contains implementation of the `hooke-spring` crate specifically for Godot 4.
+//! Contains implementation of the `hooke-spring` crate specifically for Godot Engine.
+//! 
+//! For examples, please refer to `/examples/godot_bind` in the source code.
 use godot::prelude::*;
 
 pub struct GDHookeSpringExtension;

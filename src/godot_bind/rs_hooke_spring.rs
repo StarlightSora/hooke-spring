@@ -1,4 +1,8 @@
 //! Contains the `HookeSpring` implementation for Godot.
+
+// In hindsight this is architeched a bit suboptimally,
+// but, oh well. It will do.
+
 // pull godot-rust shenanigans into scope
 use godot::classes::class_macros::private::virtuals::ZipReader::Variant;
 use godot::meta::Element;
@@ -157,7 +161,7 @@ assign_spring_compat_traits_all!(HSVector4, Vector4, f32);
 
 
 #[derive(Debug)]
-/// Types compatible with RSHookeSpring.
+/// Types compatible with `RSHookeSpring`.
 pub enum HSCompatibleTypes {
     Float(HSFloat),
     Vector2(HSVector2),
