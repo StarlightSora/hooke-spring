@@ -322,7 +322,7 @@ impl RSHookeSpring {
     #[func]
     /// Modifies the `target`.
     ///
-    /// If `do_not_animate` is `true`, the `position`` and `target` are set immediately
+    /// If `do_not_animate` is `true`, the `position` and `target` are set immediately
     /// and `velocity` is reset to zero.
     /// Otherwise, only the `target` is updated.
     pub fn set_target(&mut self, to: HSCompatibleTypes, do_not_animate: bool) {

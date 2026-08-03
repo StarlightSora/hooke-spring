@@ -1,6 +1,8 @@
-//! Contains implementation of the `hooke-spring` crate specifically for Godot Engine.
+//! Contains implementations specifically for Godot Engine.
+//! Primarily intended to be used within GDScript.
 //! 
-//! For examples, please refer to `/examples/godot_bind` in the source code.
+//! For examples, please refer to `/examples/godot_bind` in the source code
+//! as they are written in GDScript.
 use godot::prelude::*;
 
 pub struct GDHookeSpringExtension;
