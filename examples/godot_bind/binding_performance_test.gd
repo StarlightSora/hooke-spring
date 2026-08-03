@@ -12,16 +12,17 @@ func _ready() -> void:
 	var springs: Array[RSHookeSpring] = []
 	springs.resize(SPRINGS_TO_SIMULATE)
 	for i in range(SPRINGS_TO_SIMULATE):
-		# Make SPRINGS_TO_SIMULATE amount of Vector3 RSHookeSprings.
+		# Make SPRINGS_TO_SIMULATE amount of Vector3-based RSHookeSprings.
 		springs[i] = RSHookeSpring.new_vector3(0.5, PI, RSStopwatch.new_manual())
 	
 	# Let the engine breathe before running the test.
+    # This ensures that our metrics don't get skewed from engine initialization overhead.
 	await get_tree().create_timer(2.0).timeout
 	
 	var start: int = Time.get_ticks_usec()
 	for frame in range(SIMULATION_STEPS):
 		for i in range(SPRINGS_TO_SIMULATE):
-			var spring = springs[i] # as reference
+			var spring = springs[i] # Grab a mutable reference.
 			# Force the spring to update itself and intentionally discard the return value.
 			var _p = spring.get_position()
 			# Advance the time in the spring.
