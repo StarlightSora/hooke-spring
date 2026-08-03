@@ -6,6 +6,15 @@ Knowing how to write Rust code is ***not*** a prerequisite for using this librar
 
 To re-emphasize: **Just because the library is written in Rust, doesn't mean you *need* to know Rust to use it.**
 
+```gdscript
+var my_spring = RSHookeSpring.new_vector3(0.75, 3.0, RSStopwatch.new_running())
+my_spring.impulse(Vector3(6.0, -8.0, 3.5))
+await get_tree().create_timer(0.5).timeout
+print(str(my_spring.get_position()))
+```
+
+**For more usage examples, refer to** [**here**](https://github.com/StarlightSora/hooke-spring/tree/main/examples/godot_bind).
+
 ## Installation Guide
 
 1. [I just want to use this library in GDScript in the simplest way possible!](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#quick-install)
@@ -16,7 +25,46 @@ To re-emphasize: **Just because the library is written in Rust, doesn't mean you
 
 ## Performance
 
-How fast is the library? TODO
+Each RSHookeSpring instance is lazily evaluated; that is, they only recalculate its position and velocity whenever it's actually necessary, saving on unnecessary computation.
+
+Besides, the calculation itself pays very little computation time, since the library's internals are written in Rust, while still being easy to use, thanks to the Godot bindings provided.
+
+Here is a performance test of simulating 1, 10 and 100 springs over 100 simulated seconds with a target framerate of 240FPS. You can see the source code of this test [here](https://github.com/StarlightSora/hooke-spring/blob/master/examples/godot_bind/binding_performance_test.gd).
+
+1 `Vector3`-based `RSHookeSpring`:
+
+```
+100.0s | 24000f -> 240.0FPS (4166.666 usec/f)
+calc time: 1.679 usec/f -> 0.04% of frame budget
+```
+
+10 `Vector3`-based `RSHookeSpring`s:
+
+```
+100.0s | 24000f -> 240.0FPS (4166.666 usec/f)
+calc time: 17.195 usec/f -> 0.412% of frame budget
+```
+
+100 `Vector3`-based `RSHookeSpring`s:
+
+```
+100.0s | 24000f -> 240.0FPS (4166.666 usec/f)
+calc time: 159.642 usec/f -> 3.831% of frame budget
+```
+
+Computation time varies between computer hardware, but as observed here, even 100 springs being evaluated every frame uses less than 5% of the target framerate's computation time budget in this test.
+
+A native GDScript port is planned to be written in the near future. Concrete performance comparison with a native GDScript port of this library will be reported here once it is released.
+
+## Documentation
+
+For documentation, refer to the documentation available on [crates.io](https://docs.rs/hooke-spring/0.1.1/hooke_spring), and navigate to `godot_bind` > `rs_hooke_spring` > `RSHookeSpring` for the `RSHookeSpring` API, and `godot_bind` > `rs_stopwatch` > `RSStopwatch` for the `RSStopwatch` API.
+
+Unfortunately a formal GDScript-specific documentation page is not available at the time of writing. However, the documentation on crates.io is still mostly applicable for GDScript usage.
+
+## Compatibility
+
+This library requires Godot 4.1 or newer.
 
 ## Quick Install
 
