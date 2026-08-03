@@ -9,7 +9,7 @@
 ## Overview
 `hooke-spring` provides a simple, fast and flexible spring simulator based on Hooke’s Law. Although originally designed for use in games, it can be used wherever a lightweight spring simulator is needed. The crate is **`no_std` + `alloc` compatible**, with optional `std` features for real‑time clocks. As of 0.2.0, **Godot 4 support is available right out of the box** with the `godot_bind` feature flag.
 
-For the Godot-specific README, refer to [this](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md).
+**For usage in Godot**, refer to [this guide](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md).
 
 ## Use Cases
 You can use this library for:

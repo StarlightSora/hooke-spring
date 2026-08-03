@@ -2,178 +2,90 @@
 
 ## Foreword
 
-Knowing how to write Rust code is ***not*** a prerequisite for using this library in your projects. The bindings are designed to integrate with the Godot Engine directly, so that you can use it seamlessly in GDScript.
+Knowing how to write Rust code is ***not*** a prerequisite for using this library in your projects. The bindings are designed to integrate with the Godot Engine directly, so that **you can use it seamlessly in GDScript**.
 
 To re-emphasize: **Just because the library is written in Rust, doesn't mean you *need* to know Rust to use it.**
 
-**If you know how to write some Rust code**, and understand the Rust ecosystem to a basic level, **that's great!** You can get started by reading the [Getting Started Fast Guide](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#getting-started-fast-guide).
+## Installation Guide
 
-**If you have absolutely no experience**, or very little experience with Rust, **don't worry!** You can get started by reading the [Getting Started From Zero Guide](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#getting-started-from-zero-guide).
-Note that this guide *does not* cover writing Rust code in general (again, you don't *need* to know Rust if you just want to use the library!); it only provides the necessary code to use this library to your Godot projects. If you're interested in writing Rust code in general, refer to [The Rust Book](https://doc.rust-lang.org/stable/book/title-page.html).
+1. [I just want to use this library in GDScript in the simplest way possible!](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#quick-install)
 
-For more information about exporting your Godot projects with godot-rust (especially for mobile and Mac), refer to [chapter 5 of The godot-rust book](https://godot-rust.github.io/book/toolchain/index.html).
+2. [I want to use this library in an existing Godot project that already uses godot-rust!](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#integration-with-godot-rust)
 
-If you want a more comprehensive guide for using Rust for Godot development in general, refer to [The godot-rust Book](https://godot-rust.github.io/book/index.html) and the [godot-rust docs](https://godot-rust.github.io/docs/gdext/master/godot/index.html). The guide here is adapted from this book's second chapter.
+3. [I want to build the library from source code!](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#building-from-source)
 
-## Adding to An Existing Project Already Using godot-rust
+## Performance
 
-If you have an existing Godot project that already uses godot-rust, simply add this crate to your Cargo.toml dependencies:
+How fast is the library? TODO
+
+## Quick Install
+
+*Note: At the time of writing, only Windows and Linux releases are provided, due to special requirements for other builds. If you need support for Android, Mac and iOS, you need to [build the library from source](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#building-from-source), and refer to* [*chapter 5 of The godot-rust Book.*](https://godot-rust.github.io/book/toolchain/index.html)
+
+Go to the [Releases](https://github.com/StarlightSora/hooke-spring/releases) page, find the **latest release** *(don't get the ones marked as "pre-release" unless you want a bleeding edge development build)* and grab the file named `GD_RSHookeSpringLib_xx_xx_xx.7z` (where `xx_xx_xx` is the version number).
+
+Next, unzip the file. Using [PeaZip](https://peazip.github.io) is recommended if you're having trouble unzipping it. After unzipping, you should end up with a folder called `GD_RSHookeSpringLib`. If it's named `GD_RSHookeSpringLib_xx_xx_xx`, then the actual folder is likely *inside* it.
+
+Drag and drop the folder inside your Godot project directory.
+
+And you're done! Now once you open your project, you should be able to access the `RSHookeSpring` and `RSStopwatch` classes in GDScript.
+
+## Integration with godot-rust
+
+This assumes that you already have a Godot project that uses godot-rust. If you don't, then you should either use the [Quick Install](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#quick-install) guide instead if you have no interest in using Rust in your Godot projects, or refer to [The godot-rust Book](https://godot-rust.github.io/book/index.html)'s chapter 1, 2 and 3 first if you want to use Rust.
+
+Add this crate to your crate's `Cargo.toml`:
+
 ```bash
 cargo add hooke-spring --features godot_bind
 ```
-Then add this to your `lib.rs`:
+
+Then make sure to add this to your `lib.rs` so the library gets loaded to Godot:
+
 ```rs
 extern crate hooke_spring;
 ```
 
-Then run `cargo build`. You should be able to see the `RSHookeSpring` and `RSStopwatch` class in GDScript.
+Now rebuild your crate with `cargo build`, and you're done!
 
-## Getting Started Fast Guide
+Now once you open your project, you should be able to access the `RSHookeSpring` and `RSStopwatch` classes in GDScript. You should be able to access these in Rust code as well.
 
-Create a new library crate in your Godot project directory. This guide will assume the project structure below. The crate name will be `gdrs` for this example.
+## Building From Source
 
-To make a new library crate, open Terminal/Command Prompt (or something equivalent in your OS) in your project folder, and run: `cargo new gdrs --lib`
-```
-📁 my-godot-project
-├─ 📁 .git
-├─ 📄 gdrs_link.gdextension // We will get to this soon
-└─ 📁 gdrs
-   ├─ 📄 .gdignore
-   ├─ 📁 src
-   │  └─ 📄 lib.rs
-   └─ 📄 Cargo.toml
-```
-Note: The `.gdignore` file is an empty file with an empty name and the file extension `.gdignore` so Godot doesn't scan this directory for discovering game assets. It is highly recommended to add this to your crate's root directory so Godot doesn't try to incorrectly parse `.obj` files from running `cargo build`. You don't need this if your crate is located outside your Godot project directory.
+If you want to build the dynamic library file from source, you will need the following:
 
-*Note: If your Godot project uses Git for version control, and you made the crate inside your project (this guide does so), you should run `git submodule add /gdrs` afterwards to add this as a submodule of your project.*
+- [Git](https://git-scm.com)
 
-Open `Cargo.toml` and add these:
-```toml
-[lib]
-crate-type = ["cdylib"] # Compile this crate to a dynamic C library.
+- [rustup](https://rustup.rs)
 
-[dependencies]
-godot = "0.5.4"
-hooke-spring = { features = ["godot_bind"] }
-```
-Now run `cargo build` to build the crate. Make sure you run this command in your crate's directory (`my-godot-project/gdrs`), not your actual Godot project directory (`my-godot-project`)! You may need to run `cd gdrs` to navigate to your crate.
+- If you plan to modify the source code, an IDE is strongly recommended. Example: [Visual Studio Code](https://code.visualstudio.com/download)
 
-Now create a file named `gdrs_link.gdextension` in your Godot project directory. (You can name `gdrs_link` to whatever else you want.) Open it, and paste this in:
-```toml
-[configuration]
-entry_symbol = "gdext_rust_init"
-compatibility_minimum = 4.1
-reloadable = true
+Before you begin, make sure all of the above are installed in your computer.
 
-[libraries]
-linux.debug.x86_64 =     "res://gdrs/target/debug/gdrs.so"
-linux.release.x86_64 =   "res://gdrs/target/release/gdrs.so"
-windows.debug.x86_64 =   "res://gdrs/target/debug/gdrs.dll"
-windows.release.x86_64 = "res://gdrs/target/release/gdrs.dll"
-macos.debug =            "res://gdrs/target/debug/gdrs.dylib"
-macos.release =          "res://gdrs/target/release/gdrs.dylib"
-macos.debug.arm64 =      "res://gdrs/target/debug/gdrs.dylib"
-macos.release.arm64 =    "res://gdrs/target/release/gdrs.dylib"
-```
+First you need to clone this repository somewhere. Open Git Bash *(Command Prompt/Terminal typically works as well)* in a directory you want to clone the project to, then run:
 
-`compatibility_minimum`: You can set this to whatever version your project is as long as it's at least `4.1`.
-`libraries`: Rename `gdrs` to whatever your crate name actually is. For example, if your crate name is `my-crate`, then it should be something like `res://my-crate/target/debug/my-crate.dll`. If your crate is outside your Godot project directory, you'll need to use `..` to access the parent folder, then locate the crate. For example: `res://../gdrs/target/debug/gdrs.dll`
-
-After that, open `lib.rs` in your crate and paste this in:
-```rs
-use godot::prelude::*;
-
-extern crate hooke_spring; // needed to import the library
-
-struct MyExtension; // You can name this struct whatever you want
-
-#[gdextension]
-unsafe impl ExtensionLibrary for MyExtension {}
-```
-
-Run `cargo build` again. *Note: The use of `unsafe` here is necessary because godot-rust needs to communicate with Godot Engine via a FFI. Further information about this is beyond the scope of this guide.*
-
-Open your project in Godot. You should be able to see the `RSHookeSpring` and `RSStopwatch` class in GDScript.
-
-
-## Getting Started From Zero Guide
-
-First and foremorst, it's recommended to have Git installed. If you don't, you can get it [here](https://git-scm.com).
-
-Second, you need rustup. This is the easiest way to install the Rust toolchain, containing everything commonly needed to work on and build Rust projects. You can get it [here](https://rustup.rs).
-
-Make a new Godot project. To do this, open Godot Engine and click Create at the top right. (You can also use an existing project you have instead.) For this guide we will have our project named as `My Godot Project` (folder name `my-godot-project`).
-
-Go to the directory of your project. For example, if your project was created at `D:/GodotProjects/my-godot-project`, navigate there via File Explorer (or whatever equivalent to your OS).
-
-This guide will assume this project structure:
-```
-📁 my-godot-project
-├─ 📁 .git
-├─ 📄 gdrs_link.gdextension // We will get to this soon
-└─ 📁 gdrs // Should be made once you run the command mentioned below
-   ├─ 📄 .gdignore // We will have you make this file soon
-   ├─ 📁 src
-   │  └─ 📄 lib.rs
-   └─ 📄 Cargo.toml
-```
-
-Once you're in the folder (`my-godot-project`), right click on empty space and click "Open in Terminal" (or something equivalent in your OS).
-Type this command and press enter:
 ```bash
-cargo add gdrs --lib
+git clone https://github.com/StarlightSora/hooke-spring.git
 ```
 
-*Note: If your Godot project uses Git for version control, you should run `git submodule add /gdrs` afterwards to add this as a submodule of your project.*
+You should see a folder called `hooke-spring` appear.
 
-This should create a new folder named `gdrs`. It should have a file named `Cargo.toml`, and a folder named `src` that contains `lib.rs`, alongside some other things. This is called a crate in the Rust ecosystem.
+Now go to the crate directory in Bash:
 
-In your crate's root directory `my-godot-project/gdrs`, add a new file named `.gdignore`. This will make Godot exclude the crate when scanning for game asset files. (**Make sure you can see file extensions in File Explorer.** In Windows 11, you can enable this by going to View > Show > File name extensions)
-
-Now open `Cargo.toml` in your crate and add these:
-```toml
-[lib]
-crate-type = ["cdylib"] # Compile this crate to a dynamic C library.
-
-[dependencies]
-godot = "0.5.4"
-hooke-spring = { features = ["godot_bind"] }
+```bash
+cd hooke-spring
 ```
 
-Run `cargo build` in the crate directory.
-If you still have the terminal window open from earlier, you can do `cd gdrs` to navigate to the crate directory, then you can run `cargo build`.
-If you closed it already, you can right click within the crate directory and click "Open in Terminal". Then you can run `cargo build`.
+and build the crate:
 
-Now create a file named `gdrs_link.gdextension` in your Godot project directory (`my-godot-project`). Open it, and paste this in:
-```toml
-[configuration]
-entry_symbol = "gdext_rust_init"
-compatibility_minimum = 4.1
-reloadable = true
-
-[libraries]
-linux.debug.x86_64 =     "res://gdrs/target/debug/gdrs.so"
-linux.release.x86_64 =   "res://gdrs/target/release/gdrs.so"
-windows.debug.x86_64 =   "res://gdrs/target/debug/gdrs.dll"
-windows.release.x86_64 = "res://gdrs/target/release/gdrs.dll"
-macos.debug =            "res://gdrs/target/debug/gdrs.dylib"
-macos.release =          "res://gdrs/target/release/gdrs.dylib"
-macos.debug.arm64 =      "res://gdrs/target/debug/gdrs.dylib"
-macos.release.arm64 =    "res://gdrs/target/release/gdrs.dylib"
+```bash
+cargo build --features godot_bind --crate-type=dylib
 ```
 
-After that, open `lib.rs` in your crate (`my-godot-project/gdrs/src/lib.rs`) and paste this in:
-```rs
-use godot::prelude::*;
+*The command line arguments depends on your use case, but you should always include* `--features godot_bind --crate-type=dylib`.
 
-extern crate hooke_spring; // needed to import the library
+Go to `hooke-spring/target/debug` (or `hooke-spring/target/release` if you used `--release`). You should see `hooke_spring.dll` (or `.so`/`.dylib` depending on your build target). This is the built dynamic library file.
 
-struct MyExtension;
+Copy this file and put it in a folder in your Godot project directory. Then you need to make a `.gdextension` file to make Godot recognize the dynamic library file. You can learn more about this process in [The godot-rust Book](https://godot-rust.github.io/book/intro/hello-world.html#wire-up-godot-with-rust), it's a 5-minute read. **Make sure to set the `entry_symbol` as `"rs_hooke_spring_lib"`**, as that's the `entry_symbol` set in this library.
 
-#[gdextension]
-unsafe impl ExtensionLibrary for MyExtension {}
-```
-
-Run `cargo build` in your crate directory again.
-
-Open your project in Godot. You should be able to see the `RSHookeSpring` and `RSStopwatch` class in GDScript.
+And you're done! Now once you open your project, you should be able to access the `RSHookeSpring` and `RSStopwatch` classes in GDScript.
