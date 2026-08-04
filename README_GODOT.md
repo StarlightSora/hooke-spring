@@ -13,7 +13,7 @@ await get_tree().create_timer(0.5).timeout
 print(str(my_spring.get_position()))
 ```
 
-**For more usage examples, refer to** [**here**](https://github.com/StarlightSora/hooke-spring/tree/main/examples/godot_bind).
+**For more usage examples, refer to** [**here**](https://github.com/StarlightSora/hooke-spring/tree/master/examples/godot_bind).
 
 ## Installation Guide
 
@@ -60,7 +60,7 @@ A native GDScript port is planned to be written in the near future. Concrete per
 
 For documentation, there are two options:
 
-- View the [informal GDScript documentation](https://github.com/StarlightSora/hooke-spring/tree/main/examples/godot_bind/informal_api_docs.gd),
+- View the [informal GDScript documentation](https://github.com/StarlightSora/hooke-spring/tree/master/examples/godot_bind/informal_api_docs.gd),
 
 - Or view the formal Rust documentation [crates.io](https://docs.rs/hooke-spring), and navigate to `godot_bind` > `rs_hooke_spring` > `RSHookeSpring` for the `RSHookeSpring` API, and `godot_bind` > `rs_stopwatch` > `RSStopwatch` for the `RSStopwatch` API.
 
