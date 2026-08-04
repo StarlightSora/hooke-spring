@@ -4,7 +4,7 @@ compatibility_minimum = 4.1
 reloadable = true
 
 [libraries]
-windows.debug.x86_64 =   "res://GD_RSHookeSpringLib/libhooke_spring_debug.dll"
-windows.release.x86_64 = "res://GD_RSHookeSpringLib/libhooke_spring_debug.dll"
-linux.debug.x86_64 =     "res://GD_RSHookeSpringLib/libhooke_spring_debug.so"
-linux.release.x86_64 =   "res://GD_RSHookeSpringLib/libhooke_spring_debug.so"
+windows.debug.x86_64 =   "res://GD_RSHookeSpringLib/libhooke_spring.dll"
+windows.release.x86_64 = "res://GD_RSHookeSpringLib/libhooke_spring.dll"
+linux.debug.x86_64 =     "res://GD_RSHookeSpringLib/libhooke_spring.so"
+linux.release.x86_64 =   "res://GD_RSHookeSpringLib/libhooke_spring.so"
