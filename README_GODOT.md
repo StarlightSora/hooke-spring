@@ -118,6 +118,13 @@ git clone https://github.com/StarlightSora/hooke-spring.git
 
 You should see a folder called `hooke-spring` appear.
 
+Open `Cargo.toml` inside the folder, and uncomment the lines here:
+```bash
+## Uncomment below two lines if building a standalone cdylib build
+#[lib]
+#crate-type = ["cdylib"]
+```
+
 Now go to the crate directory in Bash:
 
 ```bash
@@ -127,13 +134,43 @@ cd hooke-spring
 and build the crate:
 
 ```bash
-cargo build --features godot_bind --crate-type=dylib
+cargo build --release --features godot_bind
 ```
 
-*The command line arguments depends on your use case, but you should always include* `--features godot_bind --crate-type=dylib`.
+*The command line arguments depends on your use case, but you should always include* `--features godot_bind`.
+
+Use `--target` to change the build target for the library. The official releases use `--target x86_64-unknown-linux-gnu` for Linux `.so`s.
 
 Go to `hooke-spring/target/debug` (or `hooke-spring/target/release` if you used `--release`). You should see `hooke_spring.dll` (or `.so`/`.dylib` depending on your build target). This is the built dynamic library file.
 
 Copy this file and put it in a folder in your Godot project directory. Then you need to make a `.gdextension` file to make Godot recognize the dynamic library file. You can learn more about this process in [The godot-rust Book](https://godot-rust.github.io/book/intro/hello-world.html#wire-up-godot-with-rust), it's a 5-minute read. **Make sure to set the `entry_symbol` as `"rs_hooke_spring_lib"`**, as that's the `entry_symbol` set in this library.
 
 And you're done! Now once you open your project, you should be able to access the `RSHookeSpring` and `RSStopwatch` classes in GDScript.
+
+### Troubleshooting
+
+If you are having trouble building the crate for Linux on a Windows machine (especially during the linking step), check the following:
+
+- Have you run `rustup target add x86_64-unknown-linux-gnu` before?
+
+- Do you have Ubuntu on WSL (Windows Subsystem for Linux), and ran the command in a WSL CLI?
+
+To install Ubuntu on WSL, run `wsl --install -d Ubuntu`. You'll also want the [WSL extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) in the VSCode marketplace (or something equivalent for your IDE).
+
+Then open a "Ubuntu (WSL)" terminal in VSCode.
+
+You should install the build-essential package in WSL:
+
+```bash
+sudo apt-get update && sudo apt-get install -y build-essential pkg-config clang lld
+```
+
+As well as rustup:
+
+```bash
+curl https://sh.rustup.rs -sSf | sh -s -- -y && source "$HOME/.cargo/env" && rustc --version && cargo --version
+```
+
+Finally run `cargo build --release --features godot_bind --target x86_64-unknown-linux-gnu` in the WSL terminal. It should compile without issue.
+
+The built `.so` should be located at `/target/x86_64-unknown-linux-gnu/`.
