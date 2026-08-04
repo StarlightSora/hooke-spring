@@ -66,7 +66,7 @@ cargo add hooke-spring --features godot_bind
 ## Example
 
 ```rs
-use hooke_spring::{HookeSpring, SmolStopwatch};
+use hooke_spring::prelude::*;
 use std::{time, thread};
 
 let mut spring = HookeSpring::<f64>::from_damper_speed(0.75, 8.0, Some(SmolStopwatch::wrapped()));
@@ -80,15 +80,13 @@ for i in 1..=10 {
 
 ## Roadmap
 
-- **0.1**: Core spring simulation, `no_std` support, integrated time-keeping structs
+- [x] Core spring simulation, `no_std` support, integrated time-keeping structs
 
-- **0.2**: Integration for game engines (will be opt-in via features)
+- [x] Integration for game engines (will be opt-in via features)
 
-  - Integration with Godot via [godot-rust](https://godot-rust.github.io/) bindings
+  - [x] Integration with Godot via [godot-rust](https://godot-rust.github.io/) bindings
 
-  - ~~Integration with Bevy~~ *Deferred to 0.3*
-
-- **0.3**: Integration with Bevy's data types
+  - [ ] Integration with Bevy's data types
 
 ## Attribution
 
