@@ -5,7 +5,7 @@ description = "A Lightweight Spring Simulation API in Rust, now also available f
 repository = "https://github.com/StarlightSora/hooke-spring"
 keywords = ["math", "spring", "sim", "godot"]
 categories = ["game-development", "mathematics", "no-std"]
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 #publish = false # Suppress publishing during dev build
 
