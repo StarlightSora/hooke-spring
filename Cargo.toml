@@ -1,11 +1,11 @@
 [package]
 name = "hooke-spring"
 license = "MIT"
-description = "A Lightweight Spring Simulation API in Rust"
+description = "A Lightweight Spring Simulation API in Rust, now available for Godot!"
 repository = "https://github.com/StarlightSora/hooke-spring"
 keywords = ["math", "spring", "sim", "godot"]
 categories = ["game-development", "mathematics", "no-std"]
-version = "0.2.0-rc2"
+version = "0.2.0-rc3"
 edition = "2024"
 publish = false # Suppress publishing during dev build
 

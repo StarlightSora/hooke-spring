@@ -1,6 +1,6 @@
 # hooke-spring
 
-*A Lightweight Spring Simulation API in Rust*
+*A Lightweight Spring Simulation API in Rust, now available for Godot!*
 
 ![no_std](https://img.shields.io/badge/no__std-✓-blue)
 ![crates_io](https://img.shields.io/crates/v/hooke-spring)
@@ -9,7 +9,7 @@
 
 ## Overview
 
-`hooke-spring` provides a simple, fast and flexible spring simulator based on Hooke’s Law. Although originally designed for use in games, it can be used wherever a lightweight spring simulator is needed. The crate is **`no_std` + `alloc` compatible**, with optional `std` features for real‑time clocks. As of 0.2.0, **Godot 4 support is available right out of the box** with the `godot_bind` feature flag.
+`hooke-spring` provides a simple, fast and flexible spring simulator based on Hooke’s Law. Although originally designed for use in games, it can be used wherever a lightweight spring simulator is needed. The crate is **`no_std` + `alloc` compatible**, with optional `std` features for real‑time clocks. As of 0.2.0, **Godot 4 support is available right out of the box** with the `godot_bind` feature flag or via the [prebuilt releases](https://github.com/StarlightSora/hooke-spring/releases).
 
 **For usage in Godot**, refer to [this guide](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md). **Prior Rust knowledge is *not required*!**
 
