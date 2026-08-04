@@ -20,7 +20,11 @@ libm = ["dep:libm"]
 [dependencies]
 libm = { version = "0.2", optional = true }
 godot = { version = "0.5", optional = true }
+cargo-docs-rs = "1.0.4"
 
 ## Uncomment below two lines if building a standalone cdylib build
 #[lib]
 #crate-type = ["cdylib"]
+
+[package.metadata.docs.rs]
+features = ["godot_bind"]
