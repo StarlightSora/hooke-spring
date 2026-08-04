@@ -17,11 +17,11 @@ print(str(my_spring.get_position()))
 
 ## Installation Guide
 
-1. [I just want to use this library in GDScript in the simplest way possible!](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#quick-install)
+1. [I just want to use this library in GDScript in the simplest way possible!](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#quick_install)
 
-2. [I want to use this library in an existing Godot project that already uses godot-rust!](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#integration-with-godot-rust)
+2. [I want to use this library in an existing Godot project that already uses godot-rust!](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#integration_with_godot_rust)
 
-3. [I want to build the library from source code!](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#building-from-source)
+3. [I want to build the library from source code!](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#building_from_source)
 
 ## Performance
 
@@ -72,7 +72,7 @@ This library requires Godot 4.1 or newer.
 
 ## Quick Install
 
-*Note: At the time of writing, only Windows and Linux releases are provided, due to special requirements for other builds. If you need support for Android, Mac and iOS, you need to [build the library from source](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#building-from-source), and refer to* [*chapter 5 of The godot-rust Book.*](https://godot-rust.github.io/book/toolchain/index.html)
+*Note: At the time of writing, only Windows and Linux releases are provided, due to special requirements for other builds. If you need support for Android, Mac and iOS, you need to [build the library from source](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#building-from-source), and refer to* [*chapter 5 of The godot-rust Book.*](https://godot-rust.github.io/book/toolchain/index.html)
 
 Go to the [Releases](https://github.com/StarlightSora/hooke-spring/releases) page, find the **latest release** *(don't get the ones marked as "pre-release" unless you want a bleeding edge development build)* and grab the file named `GD_RSHookeSpringLib_xx_xx_xx.7z` (where `xx_xx_xx` is the version number).
 
@@ -84,7 +84,7 @@ And you're done! Now once you open your project, you should be able to access th
 
 ## Integration with godot-rust
 
-This assumes that you already have a Godot project that uses godot-rust. If you don't, then you should either use the [Quick Install](https://github.com/StarlightSora/hooke-spring/blob/master/README-GODOT.md#quick-install) guide instead if you have no interest in using Rust in your Godot projects, or refer to [The godot-rust Book](https://godot-rust.github.io/book/index.html)'s chapter 1, 2 and 3 first if you want to use Rust.
+This assumes that you already have a Godot project that uses godot-rust. If you don't, then you should either use the [Quick Install](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#quick-install) guide instead if you have no interest in using Rust in your Godot projects, or refer to [The godot-rust Book](https://godot-rust.github.io/book/index.html)'s chapter 1, 2 and 3 first if you want to use Rust.
 
 Add this crate to your crate's `Cargo.toml`:
 
