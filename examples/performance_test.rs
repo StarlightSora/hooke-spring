@@ -10,8 +10,7 @@ fn main() {
     use std::thread;
     use std::f64::consts::PI;
     use std::time::Instant;
-    use hooke_spring::{HookeSpring, ManualClock};
-    use hooke_spring::hooke_spring::HookeSpringClock;
+    use hooke_spring::prelude::*;
 
     const fn to_rad(deg: f64) -> f64 {
         deg * PI / 180.0f64

@@ -1,0 +1,10 @@
+[configuration]
+entry_symbol = "rs_hooke_spring_lib"
+compatibility_minimum = 4.1
+reloadable = true
+
+[libraries]
+windows.debug.x86_64 =   "res://GD_RSHookeSpringLib/libhooke_spring.dll"
+windows.release.x86_64 = "res://GD_RSHookeSpringLib/libhooke_spring.dll"
+linux.debug.x86_64 =     "res://GD_RSHookeSpringLib/libhooke_spring.so"
+linux.release.x86_64 =   "res://GD_RSHookeSpringLib/libhooke_spring.so"
