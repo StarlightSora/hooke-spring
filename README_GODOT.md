@@ -58,7 +58,11 @@ A native GDScript port is planned to be written in the near future. Concrete per
 
 ## Documentation
 
-For documentation, refer to the documentation available on [crates.io](https://docs.rs/hooke-spring/0.1.1/hooke_spring), and navigate to `godot_bind` > `rs_hooke_spring` > `RSHookeSpring` for the `RSHookeSpring` API, and `godot_bind` > `rs_stopwatch` > `RSStopwatch` for the `RSStopwatch` API.
+For documentation, there are two options:
+
+- View the [informal GDScript documentation](https://github.com/StarlightSora/hooke-spring/tree/main/examples/godot_bind/informal_api_docs),
+
+- Or view the formal Rust documentation [crates.io](https://docs.rs/hooke-spring), and navigate to `godot_bind` > `rs_hooke_spring` > `RSHookeSpring` for the `RSHookeSpring` API, and `godot_bind` > `rs_stopwatch` > `RSStopwatch` for the `RSStopwatch` API.
 
 Unfortunately a formal GDScript-specific documentation page is not available at the time of writing. However, the documentation on crates.io is still mostly applicable for GDScript usage.
 
