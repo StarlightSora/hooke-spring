@@ -17,11 +17,11 @@ print(str(my_spring.get_position()))
 
 ## Installation Guide
 
-1. [I just want to use this library in GDScript in the simplest way possible!](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#quick_install)
+1. [I just want to use this library in GDScript in the simplest way possible!](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#quick-install)
 
-2. [I want to use this library in an existing Godot project that already uses godot-rust!](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#integration_with_godot_rust)
+2. [I want to use this library in an existing Godot project that already uses godot-rust!](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#integration-with-godot-rust)
 
-3. [I want to build the library from source code!](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#building_from_source)
+3. [I want to build the library from source code!](https://github.com/StarlightSora/hooke-spring/blob/master/README_GODOT.md#building-from-source)
 
 ## Performance
 
