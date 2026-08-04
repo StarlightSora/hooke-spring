@@ -1,6 +1,6 @@
 # hooke-spring
 
-*A Lightweight Spring Simulation API in Rust, now available for Godot!*
+*A Lightweight Spring Simulation API in Rust, now also available for Godot!*
 
 ![no_std](https://img.shields.io/badge/no__std-✓-blue)
 ![crates_io](https://img.shields.io/crates/v/hooke-spring)
