@@ -7,6 +7,11 @@ keywords = ["math", "spring", "sim", "godot"]
 categories = ["game-development", "mathematics", "no-std"]
 version = "0.2.2"
 edition = "2024"
+exclude = [
+    "release_template",
+    "about.hbs",
+    "about.toml",
+]
 #publish = false # Suppress publishing during dev build
 
 [features]
