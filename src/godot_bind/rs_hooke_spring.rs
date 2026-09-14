@@ -39,22 +39,22 @@ for<'a> &'a T: Mul<f64, Output = T> {
     HookeSpring::<T>::from_damper_speed(damper.unwrap_or(1.0), speed.unwrap_or(1.0), Some(boxed_clock))
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 /// Newtype around `f64`.
 pub struct HSFloat(pub f64);
 assign_spring_compat_traits_all!(HSFloat, f64, f64);
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 /// Newtype around `Vector2`.
 pub struct HSVector2(pub Vector2);
 assign_spring_compat_traits_all!(HSVector2, Vector2, f32);
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 /// Newtype around `Vector3`.
 pub struct HSVector3(pub Vector3);
 assign_spring_compat_traits_all!(HSVector3, Vector3, f32);
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 /// Newtype around `Vector4`.
 pub struct HSVector4(pub Vector4);
 assign_spring_compat_traits_all!(HSVector4, Vector4, f32);
