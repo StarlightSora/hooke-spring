@@ -49,6 +49,10 @@ impl Default for InnerRSStopwatch {
 }
 impl InnerRSStopwatch {
     /// Creates a running `InnerRSStopwatch` instance.
+    /// 
+    /// NOTE: Since this relies on `Time::get_ticks_usec`, it is not affected by `Engine.time_scale`.
+    /// IF you need this to be affected by `Engine.time_scale`, consider constructing via `new_stopped`
+    /// and manually calling `time_skip` on it every `_process` instead!
     pub fn new() -> Self {
         Self {
             created: usec_to_ets(Time::singleton().get_ticks_usec()),
@@ -144,6 +148,10 @@ pub struct RSStopwatch {
 impl RSStopwatch {
     #[func]
     /// Creates a running `RSStopwatch` instance.
+    /// 
+    /// NOTE: Since this relies on `Time`, it is not affected by `Engine.time_scale`.
+    /// IF you need this to be affected by `Engine.time_scale`, consider constructing via `new_manual`
+    /// and manually calling `time_skip` on it every `_process` instead!
     pub fn new_running() -> Gd<Self> {
         Gd::from_init_fn(|base| {
             Self {

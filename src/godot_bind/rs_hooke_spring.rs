@@ -160,7 +160,7 @@ assign_spring_compat_traits_all!(HSVector4, Vector4, f32);
 // }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Types compatible with `RSHookeSpring`.
 pub enum HSCompatibleTypes {
     Float(HSFloat),
@@ -218,7 +218,7 @@ impl ToGodot for HSCompatibleTypes {
 }
 impl Element for HSCompatibleTypes {}
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// The variants of the possible `RSHookeSpring`s.
 pub enum RSHookeSpringVariant {
     Float(HookeSpring<HSFloat>),

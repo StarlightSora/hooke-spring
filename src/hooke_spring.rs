@@ -76,8 +76,7 @@ pub type HookeSpringSpeed = f64;
 /// To be specific, `position` and `velocity` will always be invalid if any of the properties become invalid.
 /// `target`, `damper` and `speed` will not be invalid, unless they are the source of the propagation.
 /// Elapsed time will not be invalid, unless `clock` was mutated to return an invalid value. 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct HookeSpring<T> {
     position: T,
     velocity: T,
