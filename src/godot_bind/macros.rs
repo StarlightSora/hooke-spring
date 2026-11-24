@@ -1,5 +1,5 @@
 //! These macros are intended for use within the godot_support module.
-//! 
+//!
 //! Contains macros used to abstract matching logic away in the rs_hooke_spring module.
 
 /// Shorthand for branching logic when calling operations on RSHookeSpringVariants
@@ -32,7 +32,7 @@ macro_rules! hs_variant_match_typed {
             //     $method(spring, val$(, $extra)*)
             // }
             _ => {
-                godot_error!("Type mismatch!")
+                godot_error!("Type mismatch!");
             }
         }
     };
@@ -70,7 +70,7 @@ macro_rules! hs_variant_match_double_typed {
             //     $method(spring, val, val2$(, $extra)*)
             // }
             _ => {
-                godot_error!("Type mismatch!")
+                godot_error!("Type mismatch!");
             }
         }
     };
@@ -184,7 +184,7 @@ macro_rules! hs_variant_getter_generic_deref {
 pub(super) use hs_variant_getter_generic_deref;
 
 ///// Similar to `assign_spring_compat_traits_all!`, but specifically designed for Godot matrix data types
-///// 
+/////
 ///// Mul-related traits need to be manually assigned.
 ///// This is because naively multiplying these data types with a float
 ///// is clearly not what you ever want to do.

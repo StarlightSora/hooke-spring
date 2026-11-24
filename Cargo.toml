@@ -21,6 +21,7 @@ std = []
 smol_stopwatch = ["std"]
 no_std = ["libm"]
 libm = ["dep:libm"]
+standalone_cdylib = []
 
 [dependencies]
 libm = { version = "0.2", optional = true }

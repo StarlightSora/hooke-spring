@@ -39,11 +39,13 @@ This crate has the following Cargo features:
 |`smol_stopwatch`|Provides `SmolStopwatch` for real-time|`std`|`no_std`|
 |`no_std`|Disables usage of `std`, use `libm` + `alloc` instead|`libm`|`std`|
 |`libm`|Uses the `libm` crate for math instead of `f64` intrinsics|(None)|(None)|
-|`godot_bind`|Enable bindings for Godot Engine|(None)|(None)*|
+|`godot_bind`|Enable bindings for Godot Engine|(None)|(None)\*|
+|`standalone_cdylib`|Flag used when compiling as dedicated cdylib for Godot|(None)\*\*|(None)|
 
 The crate enables `std` and `smol_stopwatch` by default.
 
 \*The `godot` crate itself doesn't work in a `no_std` environment.
+\*\*This is a no-op if `godot_bind` is not enabled.
 
 ## Usage
 
